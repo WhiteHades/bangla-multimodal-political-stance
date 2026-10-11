@@ -15,7 +15,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Evaluating political stance in Bangla news requires distinguishing item-level framing from outlet-level bias and controlling the evidence available to models. We examine a working collection of 198 news items with government-critique, neutral, and government-leaning labels. A provenance audit identifies 144 items with consistent headline or source-link matches to BanglaBias, one item with conflicting matches, and 53 unmatched items. Separate text and image stance fields agree on 72 of 152 jointly labelled items. We audit historical text and vision--language evaluations and identify augmentation leakage in the original fixed text split, test-fold checkpoint selection in a subsequent cross-validation implementation, and unequal evaluation populations. We retain earlier model summaries as exploratory evidence and specify an evaluation protocol with source grouping, independent inner validation, and matched text--image populations. The available results do not yet establish a reliable multimodal advantage. This analysis clarifies the data lineage and experimental controls needed for a defensible comparison.
+Evaluating political stance in Bangla news requires distinguishing item-level framing from outlet-level bias and controlling the evidence available to models. We examine a working collection of 198 news items with government-critique, neutral, and government-leaning labels. A provenance audit identifies 145 items with consistent headline or source-link matches to BanglaBias after one verified URL correction, and 53 unmatched items. Separate text and image stance fields agree on 72 of 152 jointly labelled items. We audit historical text and vision--language evaluations and identify augmentation leakage in the original fixed text split, test-fold checkpoint selection in a subsequent cross-validation implementation, and unequal evaluation populations. We retain earlier model summaries as exploratory evidence and specify an evaluation protocol with source grouping, independent inner validation, and matched text--image populations. The available results do not yet establish a reliable multimodal advantage. This analysis clarifies the data lineage and experimental controls needed for a defensible comparison.
 \end{abstract}
 
 \section{Introduction}
@@ -47,19 +47,19 @@ For matching, we normalize headlines to Unicode NFC and collapse whitespace; URL
 \toprule
 Matching evidence & Items \\
 \midrule
-Headline and URL identify the same candidate & 133 \\
+Headline and URL identify the same candidate & 134 \\
 URL only & 5 \\
 Headline only & 6 \\
-Conflicting headline and URL candidates & 1 \\
+Conflicting headline and URL candidates & 0 \\
 Neither field matches & 53 \\
 \midrule
 Total & 198 \\
 \bottomrule
 \end{tabular}
-\caption{Processed-item overlap with the 200-row BanglaBias snapshot. There are 144 consistently matched items and one conflicting item.}\label{tab:provenance}
+\caption{Processed-item overlap with the 200-row BanglaBias snapshot. There are 145 consistently matched items after the verified URL correction.}\label{tab:provenance}
 \end{table}
 
-The conflicting item has a headline matching upstream ID~160 but a URL matching ID~157. Two pairs of local items also share source URLs despite different headlines. They must be resolved or grouped conservatively before evaluation. Two raw items are absent from the processed table; their removal is observable, but the audit does not establish the original exclusion rationale. We therefore withdraw the earlier claim that all removals followed verified visual deduplication.
+The raw Image\_29 row has a headline matching upstream ID~160 but a URL matching ID~157. We verified the Prothom Alo page for ID~160 and corrected only its source URL, preserving the original URL and all labels. The remaining Image\_154/Image\_155 pair shares a source URL despite different headlines and is conservatively assigned to one source group. Two raw items are absent from the processed table; their removal is observable, but the audit does not establish the original exclusion rationale. We therefore withdraw the earlier claim that all removals followed verified visual deduplication.
 
 \subsection{Labels and annotation coverage}
 The final item-label counts are 103 government-critique, 53 neutral, and 42 government-leaning (Table~\ref{tab:class_distribution}). The critique class accounts for 52.0\% of items. These are final item labels in the processed table; inherited article labels and separate image labels are distinct fields.
@@ -97,7 +97,7 @@ The vision--language families are CLIP, ALIGN, BLIP, ViLT, FLAVA, and a CountVec
 \subsection{Historical evaluation protocols}
 The original text predictions contain 47 test rows from a fixed split of the augmented corpus. Of these, 20 are augmented rows, and 25 source articles are shared between training and test. Thus, the original text scores cannot establish generalization to unseen source articles. Original baseline vision--language predictions cover 30 items from a fixed split, while the original proposed fusion notebook uses five folds over 149 image-associated items. An accuracy of 63.2\% from that fusion notebook cannot establish superiority over a baseline scored on a separate 30-item split.
 
-A later cross-validation implementation reports pooled out-of-fold predictions and fold-level variation. However, its training wrapper supplies the outer test fold as both validation and test data. The neural trainer selects the best checkpoint using validation macro-F1, so this exposes the outer evaluation labels to checkpoint selection. Its grouping also falls back to individual item IDs when the requested source-group column is absent. The current corpus lacks that column, and individual item IDs do not protect the repeated source URLs. Tables~\ref{tab:text_models} and~\ref{tab:multimodal_models} retain the later saved summaries with these qualifications; they are not corrected-protocol results.
+A later cross-validation implementation reports pooled out-of-fold predictions and fold-level variation. However, its training wrapper supplies the outer test fold as both validation and test data. The neural trainer selects the best checkpoint using validation macro-F1, so this exposes the outer evaluation labels to checkpoint selection. Its grouping also falls back to individual item IDs when the requested source-group column is absent. The corpus lacks that column, and individual item IDs do not protect the repeated source URLs. We have repaired the shared split logic to join declared groups, normalized URLs, and augmentation parents transitively; the historical neural runs still require rerunning. Tables~\ref{tab:text_models} and~\ref{tab:multimodal_models} retain the later saved summaries with these qualifications; they are not corrected-protocol results.
 
 \subsection{Corrected comparison protocol}\label{sec:experimental_setup}
 The required primary comparison uses the same original readable-image items, headline inputs, source groups, and outer folds for every text-only and multimodal model. Repeated source URLs must share a group; metadata conflicts require correction or conservative exclusion before the item list is frozen. Evaluation retains the natural label distribution.
@@ -165,7 +165,7 @@ The earlier restricted text re-score includes 87 image-associated items, compare
 Appendix~\ref{sec:historical} also retains the historical ablation point estimates. Equal rounded scores with and without augmentation do not establish that augmentation has no effect; positive differences after unfreezing encoders do not establish reliable improvement. Those conclusions require verified input/configuration changes and paired reruns. Previously quoted significance tests and aggregate error counts are not used as final evidence because the underlying evaluation issues remain unresolved.
 
 \subsection{Fresh headline baseline diagnostics}
-A local headline-only diagnostic gives TF-IDF macro-F1~0.505 (95\% interval 0.430--0.574, $n=198$) and 0.584 (0.491--0.669, $n=149$ readable-image items). Its corresponding original-frequency majority floors are 0.228 and 0.217. These diagnostic runs predate source-URL grouping and therefore also remain provisional. The difference between their two TF-IDF scores is a population difference, not an image benefit: both classifiers use text alone.
+A corrected local headline-only diagnostic gives TF-IDF macro-F1~0.496 (95\% item-bootstrap interval 0.415--0.569, $n=198$) and 0.543 (0.457--0.619, $n=149$ readable-image items). Its corresponding original-frequency majority floors are 0.228 and 0.217. These reruns use repaired source grouping and the verified URL correction; augmentation is attached only to training parents. The difference between their two TF-IDF scores is a population difference, not an image benefit: both classifiers use text alone.
 
 \section{Discussion}
 The audit changes what the evidence can support. First, direct overlap with BanglaBias requires attribution and a clear distinction between inherited article data and any additional image collection or annotations. The 53 unmatched rows and annotation procedures still require documentation before a resource-novelty claim.
