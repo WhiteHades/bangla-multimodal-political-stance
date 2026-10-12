@@ -1,0 +1,95 @@
+{
+  "corpus": {
+    "items": 198,
+    "labels": {
+      "govt_critique": 103,
+      "neutral": 53,
+      "govt_leaning": 42
+    },
+    "majority_class_share": 0.52,
+    "with_image": 150,
+    "without_image": 48,
+    "outlets": 39,
+    "median_text_chars": 1829,
+    "median_text_words": 276,
+    "text_equals_title_share": 0.066
+  },
+  "multimodal_subset": {
+    "items": 150,
+    "labels": {
+      "govt_critique": 73,
+      "neutral": 43,
+      "govt_leaning": 34
+    }
+  },
+  "annotators": {
+    "coverage": {
+      "annotator_1": 32,
+      "annotator_2": 197,
+      "annotator_3": 197
+    },
+    "pairwise_cohen_kappa": {
+      "annotator_1|annotator_2": 0.4539249146757679,
+      "annotator_1|annotator_3": 0.1957671957671958,
+      "annotator_2|annotator_3": 0.7313081215127093
+    }
+  },
+  "modality_label_agreement": {
+    "items_labelled_both_ways": 152,
+    "agree": 72,
+    "agreement_rate": 0.474
+  },
+  "splits": {
+    "grouped": {
+      "sizes": {
+        "train": 219,
+        "val": 30,
+        "test": 29
+      },
+      "labels": {
+        "train": {
+          "neutral": 76,
+          "govt_critique": 73,
+          "govt_leaning": 70
+        },
+        "val": {
+          "govt_critique": 16,
+          "neutral": 8,
+          "govt_leaning": 6
+        },
+        "test": {
+          "govt_critique": 15,
+          "neutral": 8,
+          "govt_leaning": 6
+        }
+      },
+      "leakage": "no group overlap between splits",
+      "clean": true
+    },
+    "as_published": {
+      "sizes": {
+        "train": 218,
+        "val": 47,
+        "test": 47
+      },
+      "leakage": "train/val=17 train/test=25 val/test=3",
+      "clean": false,
+      "warning": "augmented variants of the same source article appear in more than one split; scores computed on this test set are optimistic"
+    }
+  },
+  "images": {
+    "raw_files": 109,
+    "processed_files": 50,
+    "raw_extensions": [
+      ".avif",
+      ".jpg",
+      ".svg",
+      ".webp"
+    ]
+  },
+  "labels_reference": {
+    "0": "govt_critique",
+    "1": "neutral",
+    "2": "govt_leaning"
+  }
+}
