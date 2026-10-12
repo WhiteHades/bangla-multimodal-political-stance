@@ -1,0 +1,93 @@
+"""Run every committed model config under the corrected matched protocol.
+
+Primary population: the readable-image items, headline input, for every text and
+vision-language config. Secondary population: all items, headline input, text
+configs only. Folds, source groups and inner validation come from
+`bmpb.crossval`; nothing here selects or tunes anything.
+
+A model that fails is recorded as failed with its error, not dropped silently.
+
+    python -u scripts/run_matched_sweep.py --out experiments/matched
+"""
+
+import argparse
+import hashlib
+import json
+import time
+import traceback
+from pathlib import Path
+
+import pandas as pd
+
+from bmpb.crossval import cross_validate
+from bmpb.data.dataset import load_image
+from bmpb.paths import CONFIGS, CORPUS
+
+TEXT = ["majority", "tfidf_logreg", "banglabert", "bangla_electra", "mbert", "xlmr", "mt5"]
+MULTIMODAL = ["countvec_vit", "clip", "align", "blip", "vilt", "flava"]
+
+
+def populations():
+    corpus = pd.read_csv(CORPUS)
+    corpus["text"] = corpus["title"]
+    corpus["has_image"] = [load_image(path) is not None for path in corpus.image_path]
+    paired = corpus[corpus.has_image].reset_index(drop=True)
+    return {"paired_headlines": paired, "all_headlines": corpus}
+
+
+def digest(frame):
+    columns = ["item_id", "text", "label", "source_url"]
+    return hashlib.sha256(frame[columns].to_csv(index=False).encode()).hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", default="experiments/matched")
+    parser.add_argument("--only", nargs="*", help="restrict to these config names")
+    parser.add_argument("--population", nargs="*", help="restrict to these populations")
+    args = parser.parse_args()
+
+    plan = {"paired_headlines": TEXT + MULTIMODAL, "all_headlines": TEXT}
+    frames = populations()
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    summary_path = out / "sweep_summary.json"
+    rows = json.loads(summary_path.read_text()) if summary_path.exists() else []
+    done = {(r["population"], r["name"]) for r in rows if r.get("status") == "ok"}
+
+    for population, names in plan.items():
+        if args.population and population not in args.population:
+            continue
+        frame = frames[population]
+        for name in names:
+            if args.only and name not in args.only:
+                continue
+            if (population, name) in done:
+                print(f"skip {population}/{name}: already done", flush=True)
+                continue
+            kind = "multimodal" if name in MULTIMODAL else "text"
+            config = CONFIGS / kind / f"{name}.yaml"
+            started = time.time()
+            print(f"=== {population} / {name} (n={len(frame)})", flush=True)
+            try:
+                result = cross_validate(config, corpus=frame, out=out / population)
+                row = {**result, "status": "ok"}
+            except Exception as error:  # noqa: BLE001 - record and continue
+                traceback.print_exc()
+                row = {"name": name, "status": "failed", "error": repr(error)}
+            row.update(
+                population=population,
+                input_items=len(frame),
+                input_sha256=digest(frame),
+                wall_seconds=round(time.time() - started, 1),
+            )
+            rows = [r for r in rows if (r["population"], r["name"]) != (population, name)]
+            rows.append(row)
+            summary_path.write_text(json.dumps(rows, indent=2) + "\n")
+            status = row["status"]
+            score = f" macro-F1={row['macro_f1']:.3f}" if status == "ok" else ""
+            print(f"--- {population} / {name}: {status}{score}", flush=True)
+
+
+if __name__ == "__main__":
+    main()
