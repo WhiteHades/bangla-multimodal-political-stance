@@ -8,6 +8,10 @@ configs only. Folds, source groups and inner validation come from
 A model that fails is recorded as failed with its error, not dropped silently.
 
     python -u scripts/run_matched_sweep.py --out experiments/matched
+    python -u scripts/run_matched_sweep.py --seed 43 --out experiments/seeds/seed-43
+
+`--seed` overrides the config seed, which sets both the fold assignment and
+model initialisation; within one seed every model still shares the same folds.
 """
 
 import argparse
@@ -18,6 +22,7 @@ import traceback
 from pathlib import Path
 
 import pandas as pd
+import yaml
 
 from bmpb.crossval import cross_validate
 from bmpb.data.dataset import load_image
@@ -45,6 +50,7 @@ def main():
     parser.add_argument("--out", default="experiments/matched")
     parser.add_argument("--only", nargs="*", help="restrict to these config names")
     parser.add_argument("--population", nargs="*", help="restrict to these populations")
+    parser.add_argument("--seed", type=int, help="override the seed in every config")
     args = parser.parse_args()
 
     plan = {"paired_headlines": TEXT + MULTIMODAL, "all_headlines": TEXT}
@@ -67,6 +73,12 @@ def main():
                 continue
             kind = "multimodal" if name in MULTIMODAL else "text"
             config = CONFIGS / kind / f"{name}.yaml"
+            if args.seed is not None:
+                settings = yaml.safe_load(config.read_text())
+                settings["seed"] = args.seed
+                config = out / "configs" / f"{name}.yaml"
+                config.parent.mkdir(parents=True, exist_ok=True)
+                config.write_text(yaml.safe_dump(settings, sort_keys=False))
             started = time.time()
             print(f"=== {population} / {name} (n={len(frame)})", flush=True)
             try:
