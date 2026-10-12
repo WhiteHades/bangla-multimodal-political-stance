@@ -1,3 +1,23 @@
+## 2026-10-12 · Claude (Opus 5.5, Claude Code) · agent/experiments-grouped-evaluation (seeds)
+
+Done: the author asked for a multi-seed rerun on Colab. Added `--seed` to
+`scripts/run_matched_sweep.py`, `notebooks/run_seeds_colab.ipynb` (seeds 43–46,
+resumable to Google Drive) and `scripts/seed_analysis.py`. The aggregation was
+fixed before any extra seed ran: per-model mean/SD/range of macro-F1, and
+per-pair paired differences with counts of seeds whose interval is above or
+below zero. The bundle is at `experiments/colab/bmpb-bundle.tar.gz` (local,
+gitignored, built at bfe2dd3, article bodies stripped).
+
+Verified: the seed override and the analysis were smoke-tested locally on the
+sklearn baselines (seed 43 TF-IDF paired macro-F1 0.506 vs 0.543 at seed 42).
+
+Not verified / open: no extra seed has run on a GPU yet. CountVec+ViT fails
+locally only because torchvision is missing here; Colab has it.
+
+Needs the author: run the notebook and return `bmpb-seeds.tar.gz`; then unpack
+it into `experiments/seeds/` and run
+`cd scripts && python seed_analysis.py ../experiments/matched ../experiments/seeds/seed-*`.
+
 ## 2026-10-12 · Claude (Opus 5.5, Claude Code) · agent/experiments-grouped-evaluation
 
 Done: ran the corrected matched sweep on a Kaggle T4 (private kernel
