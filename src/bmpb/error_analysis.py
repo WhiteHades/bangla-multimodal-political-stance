@@ -10,13 +10,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 from bmpb.paths import CORPUS, EXPERIMENTS, FIGURES, TABLES
 from bmpb.significance import _latest_predictions
@@ -51,9 +51,7 @@ def _pick_top_models(all_preds: dict[str, pd.DataFrame]) -> list[str]:
 # ── confusion matrix heatmaps ───────────────────────────────────────────────
 
 
-def _save_confusion_matrices(
-    all_preds: dict[str, pd.DataFrame], fig_dir: Path
-) -> list[Path]:
+def _save_confusion_matrices(all_preds: dict[str, pd.DataFrame], fig_dir: Path) -> list[Path]:
     """Save confusion matrix heatmaps for top models. Returns saved paths."""
     top = _pick_top_models(all_preds)
     log.info("Confusion matrices for: %s", top)
@@ -103,15 +101,17 @@ def _per_class_error_rates(all_preds: dict[str, pd.DataFrame]) -> pd.DataFrame:
             correct = (df.loc[mask, "predicted"] == cls).sum()
             total = int(mask.sum())
             acc = correct / total
-            rows.append({
-                "model": model_name,
-                "class": LABEL_NAMES[cls],
-                "class_id": cls,
-                "n": total,
-                "correct": int(correct),
-                "accuracy": round(float(acc), 4),
-                "error_rate": round(1 - float(acc), 4),
-            })
+            rows.append(
+                {
+                    "model": model_name,
+                    "class": LABEL_NAMES[cls],
+                    "class_id": cls,
+                    "n": total,
+                    "correct": int(correct),
+                    "accuracy": round(float(acc), 4),
+                    "error_rate": round(1 - float(acc), 4),
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -139,12 +139,14 @@ def _hardest_items(
     rows = []
     for iid, err_count in error_counts.items():
         total = total_models_per_item[iid]
-        rows.append({
-            "item_id": iid,
-            "errors": err_count,
-            "models_tested": total,
-            "error_frac": round(err_count / total, 3),
-        })
+        rows.append(
+            {
+                "item_id": iid,
+                "errors": err_count,
+                "models_tested": total,
+                "error_frac": round(err_count / total, 3),
+            }
+        )
     hard = pd.DataFrame(rows).sort_values("error_frac", ascending=False).head(top_n)
 
     # Join with corpus for headline and label
@@ -169,30 +171,35 @@ def _hardest_items(
 # ── outlet bias ──────────────────────────────────────────────────────────────
 
 
-def _outlet_accuracy(
-    all_preds: dict[str, pd.DataFrame], corpus: pd.DataFrame
-) -> pd.DataFrame:
+def _outlet_accuracy(all_preds: dict[str, pd.DataFrame], corpus: pd.DataFrame) -> pd.DataFrame:
     """Accuracy broken down by news outlet, averaged across models."""
     rows = []
     for model_name, df in sorted(all_preds.items()):
         merged = df.merge(corpus[["item_id", "outlet"]], on="item_id", how="left")
         for outlet, grp in merged.groupby("outlet"):
             acc = accuracy_score(grp["label"], grp["predicted"])
-            rows.append({
-                "model": model_name,
-                "outlet": outlet,
-                "n": len(grp),
-                "accuracy": round(float(acc), 4),
-            })
+            rows.append(
+                {
+                    "model": model_name,
+                    "outlet": outlet,
+                    "n": len(grp),
+                    "accuracy": round(float(acc), 4),
+                }
+            )
     return pd.DataFrame(rows)
 
 
 def _save_outlet_chart(outlet_df: pd.DataFrame, fig_dir: Path) -> Path:
     """Bar chart of accuracy by outlet, averaged across models."""
-    avg = outlet_df.groupby("outlet").agg(
-        accuracy=("accuracy", "mean"),
-        n=("n", "first"),
-    ).reset_index().sort_values("accuracy", ascending=False)
+    avg = (
+        outlet_df.groupby("outlet")
+        .agg(
+            accuracy=("accuracy", "mean"),
+            n=("n", "first"),
+        )
+        .reset_index()
+        .sort_values("accuracy", ascending=False)
+    )
 
     fig, ax = plt.subplots(figsize=(8, 4))
     bars = ax.bar(range(len(avg)), avg["accuracy"], color="steelblue")
@@ -201,7 +208,7 @@ def _save_outlet_chart(outlet_df: pd.DataFrame, fig_dir: Path) -> Path:
     ax.set_ylabel("Mean Accuracy (across models)")
     ax.set_title("Accuracy by News Outlet")
     ax.set_ylim(0, 1)
-    for bar, n in zip(bars, avg["n"]):
+    for bar, n in zip(bars, avg["n"], strict=True):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + 0.01,
@@ -220,9 +227,7 @@ def _save_outlet_chart(outlet_df: pd.DataFrame, fig_dir: Path) -> Path:
 # ── headline length effect ───────────────────────────────────────────────────
 
 
-def _length_accuracy(
-    all_preds: dict[str, pd.DataFrame], corpus: pd.DataFrame
-) -> pd.DataFrame:
+def _length_accuracy(all_preds: dict[str, pd.DataFrame], corpus: pd.DataFrame) -> pd.DataFrame:
     """Accuracy by headline length bin."""
     corpus = corpus.copy()
     corpus["title_len"] = corpus["title"].fillna("").str.len()
@@ -237,21 +242,27 @@ def _length_accuracy(
             if len(grp) == 0:
                 continue
             acc = accuracy_score(grp["label"], grp["predicted"])
-            rows.append({
-                "model": model_name,
-                "len_bin": str(lbin),
-                "n": len(grp),
-                "accuracy": round(float(acc), 4),
-            })
+            rows.append(
+                {
+                    "model": model_name,
+                    "len_bin": str(lbin),
+                    "n": len(grp),
+                    "accuracy": round(float(acc), 4),
+                }
+            )
     return pd.DataFrame(rows)
 
 
 def _save_length_chart(length_df: pd.DataFrame, fig_dir: Path) -> Path:
     """Grouped bar chart of accuracy by headline length."""
-    avg = length_df.groupby("len_bin").agg(
-        accuracy=("accuracy", "mean"),
-        n=("n", "sum"),
-    ).reset_index()
+    avg = (
+        length_df.groupby("len_bin")
+        .agg(
+            accuracy=("accuracy", "mean"),
+            n=("n", "sum"),
+        )
+        .reset_index()
+    )
 
     # Preserve bin order
     bin_order = ["<30", "30-60", "60-100", "100-200", "200+"]
@@ -266,7 +277,7 @@ def _save_length_chart(length_df: pd.DataFrame, fig_dir: Path) -> Path:
     ax.set_ylabel("Mean Accuracy (across models)")
     ax.set_title("Accuracy by Headline Length")
     ax.set_ylim(0, 1)
-    for bar, n in zip(bars, avg["n"]):
+    for bar, n in zip(bars, avg["n"], strict=True):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             bar.get_height() + 0.01,
@@ -315,9 +326,7 @@ def _write_markdown(
 
     # Per-class error rates
     lines.append("## Per-Class Error Rates\n")
-    pivot = per_class.pivot_table(
-        index="model", columns="class", values="error_rate"
-    ).reset_index()
+    pivot = per_class.pivot_table(index="model", columns="class", values="error_rate").reset_index()
     lines.append(_df_to_md_table(pivot))
     lines.append("")
 
@@ -339,19 +348,28 @@ def _write_markdown(
 
     # Outlet accuracy
     lines.append("\n## Accuracy by Outlet\n")
-    outlet_avg = outlet_df.groupby("outlet").agg(
-        mean_acc=("accuracy", "mean"),
-        n=("n", "first"),
-    ).sort_values("mean_acc", ascending=False).reset_index()
+    outlet_avg = (
+        outlet_df.groupby("outlet")
+        .agg(
+            mean_acc=("accuracy", "mean"),
+            n=("n", "first"),
+        )
+        .sort_values("mean_acc", ascending=False)
+        .reset_index()
+    )
     lines.append(_df_to_md_table(outlet_avg))
     lines.append("")
 
     # Length accuracy
     lines.append("\n## Accuracy by Headline Length\n")
-    len_avg = length_df.groupby("len_bin").agg(
-        mean_acc=("accuracy", "mean"),
-        total_items=("n", "sum"),
-    ).reset_index()
+    len_avg = (
+        length_df.groupby("len_bin")
+        .agg(
+            mean_acc=("accuracy", "mean"),
+            total_items=("n", "sum"),
+        )
+        .reset_index()
+    )
     lines.append(_df_to_md_table(len_avg))
     lines.append("")
 

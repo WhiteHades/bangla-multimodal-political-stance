@@ -10,12 +10,13 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\input{matched_tables}
 \title{From Words to Images: Evaluating Bangla Multimodal Political Stance Detection}
 \author{Anonymous Authors}
 \begin{document}
 \maketitle
 \begin{abstract}
-Evaluating political stance in Bangla news requires distinguishing item-level framing from outlet-level bias and controlling the evidence available to models. We examine a working collection of 198 news items with government-critique, neutral, and government-leaning labels. A provenance audit identifies 145 items with consistent headline or source-link matches to BanglaBias after one verified URL correction, and 53 unmatched items. Separate text and image stance fields agree on 72 of 152 jointly labelled items. We audit historical text and vision--language evaluations and identify augmentation leakage in the original fixed text split, test-fold checkpoint selection in a subsequent cross-validation implementation, and unequal evaluation populations. We retain earlier model summaries as exploratory evidence and specify an evaluation protocol with source grouping, independent inner validation, and matched text--image populations. The available results do not yet establish a reliable multimodal advantage. This analysis clarifies the data lineage and experimental controls needed for a defensible comparison.
+Evaluating political stance in Bangla news requires distinguishing item-level framing from outlet-level bias and controlling the evidence available to models. We examine a collection of 198 news items with government-critique, neutral, and government-leaning labels. A provenance audit identifies 145 items with consistent headline or source-link matches to BanglaBias after one verified URL correction, and 53 unmatched items. Separate text and image stance fields agree on 72 of 152 jointly labelled items. Auditing the earlier experiments, we find augmentation leakage in the original text split, test-fold checkpoint selection in a later cross-validation implementation, and unequal evaluation populations. We then rerun thirteen text and vision--language models under a corrected protocol: one source-grouped five-fold split of 149 readable-image items, headline input for every model, and checkpoint selection on an inner validation split. A character n-gram TF-IDF classifier reaches macro-F1 0.543 (95\% CI 0.457--0.619). Every vision--language model scores below it, by 0.117 to 0.218 in paired comparisons whose source-group bootstrap intervals exclude zero. Against fine-tuned BanglaBERT (0.367), the paired differences range from $-0.042$ to $+0.058$, with every interval including zero. On this sample, we find no evidence that adding the photograph improves headline stance classification.
 \end{abstract}
 
 \section{Introduction}
@@ -25,7 +26,7 @@ Bangla political stance resources already exist. In particular, BanglaBias conta
 
 The available model experiments span several evaluation protocols. The original text split was drawn after augmentation, while original baseline vision--language models and fusion models were evaluated on different populations. A later implementation introduced pooled cross-validation scores but used the outer test fold to select neural checkpoints. These issues affect the interpretation of model rankings and gains.
 
-This revision makes three contributions supported by the audit: a row-level provenance audit, a descriptive analysis of annotation coverage and modality-label disagreement, and an audit of the experimental lineage with a corrected evaluation specification. Historical model summaries are preserved as exploratory results. We do not claim a new first-of-its-kind dataset, a verified fusion advantage, or completed neural runs under the corrected protocol.
+This paper makes four contributions: a row-level provenance audit, a descriptive analysis of annotation coverage and modality-label disagreement, an audit of the experimental lineage, and a matched re-evaluation of thirteen text and vision--language models under one corrected protocol. Historical model summaries are kept in an appendix for traceability. We do not claim a new first-of-its-kind dataset. The corrected comparison finds no evidence of a multimodal advantage.
 
 \section{Related Work}
 \paragraph{Bangla political stance.}
@@ -86,38 +87,127 @@ Text/article and image stance labels agree on 72 of 152 jointly labelled items (
 \subsection{Text and image availability}
 The original preprocessed text consists of short headlines, with a median of eight words. The current processed text column mixes 127 recovered article bodies and 71 headlines. The primary corrected comparison fixes the input to the headline field for every model, avoiding source-dependent article-recovery differences. Until annotation records specify otherwise, this is described as predicting item stance from headlines rather than newly annotating headline stance.
 
-The current corpus has 150 image-path entries, of which 149 decode successfully in the audited snapshot. Earlier vision--language summaries use 86 items, while a restricted re-score of text predictions uses 87. These figures refer to different snapshots or eligibility rules; they are not interchangeable descriptions of the dataset. The corrected comparison must freeze one readable-image item list. Image loading converts readable files to RGB and resizes according to model configuration. The present artifacts do not establish perceptual-hash deduplication, a minimum-resolution exclusion rule, or aspect-ratio-preserving padding for every run.
+The current corpus has 150 image-path entries, of which 149 decode successfully in the audited snapshot. Earlier vision--language summaries use 86 items, while a restricted re-score of text predictions uses 87. These figures refer to different snapshots or eligibility rules; they are not interchangeable descriptions of the dataset. The corrected comparison freezes the 149 decodable items as its primary population. Image loading converts readable files to RGB and resizes according to model configuration. The present artifacts do not establish perceptual-hash deduplication, a minimum-resolution exclusion rule, or aspect-ratio-preserving padding for every run.
 
 \section{Methods and Evaluation Lineage}\label{sec:methods}
 \subsection{Model families}
-The saved comparison includes five text encoders (BanglaBERT, Bangla-ELECTRA, mBERT, XLM-RoBERTa, and mT5), a TF-IDF/logistic-regression baseline, and a majority baseline. The text baseline uses character-within-word 2--5-grams, minimum document frequency~2, up to 50,000 features, and logistic regression with $C=1$ and balanced class weights. Vectorization is fitted on training data. The majority floor uses original training-label frequencies without augmentation.
+The comparison includes five text encoders: BanglaBERT \citep{bhattacharjee2022banglabert}, a community Bangla-ELECTRA checkpoint (\texttt{monsoon-nlp/bangla-electra}; architecture from \citealp{clark2020electra}), mBERT \citep{devlin2019bert}, XLM-RoBERTa \citep{conneau2020xlmr}, and the mT5 encoder with a classification head \citep{xue2021mt5}. It also includes a TF-IDF/logistic-regression baseline and a majority baseline. The text baseline uses character-within-word 2--5-grams, minimum document frequency~2, up to 50,000 features, and logistic regression with $C=1$ and balanced class weights. Vectorization is fitted on training data. The majority floor uses original training-label frequencies without augmentation.
 
-The vision--language families are CLIP, ALIGN, BLIP, ViLT, FLAVA, and a CountVectorizer/ViT hybrid. In the inspected implementation, the hybrid concatenates count-vector text features with frozen ViT representations and fits logistic regression, rather than the SVM described in the previous manuscript. Optimizers, encoder freezing, image sizes, learning rates, and epoch budgets vary by configuration; a single training recipe does not describe all models. For example, the saved BanglaBERT configuration specifies eight epochs, batch size~16, learning rate $2\times10^{-5}$, and early-stopping patience~3.
+The vision--language families are CLIP \citep{radford2021clip}, ALIGN \citep{jia2021align}, BLIP \citep{li2022blip}, ViLT \citep{kim2021vilt}, FLAVA \citep{singh2022flava}, and a CountVectorizer/ViT hybrid. In the inspected implementation, the hybrid concatenates count-vector text features with frozen ViT representations and fits logistic regression, rather than the SVM described in the previous manuscript. Optimizers, encoder freezing, image sizes, learning rates, and epoch budgets vary by configuration; a single training recipe does not describe all models. For example, the saved BanglaBERT configuration specifies eight epochs, batch size~16, learning rate $2\times10^{-5}$, and early-stopping patience~3.
 
 \subsection{Historical evaluation protocols}
 The original text predictions contain 47 test rows from a fixed split of the augmented corpus. Of these, 20 are augmented rows, and 25 source articles are shared between training and test. Thus, the original text scores cannot establish generalization to unseen source articles. Original baseline vision--language predictions cover 30 items from a fixed split, while the original proposed fusion notebook uses five folds over 149 image-associated items. An accuracy of 63.2\% from that fusion notebook cannot establish superiority over a baseline scored on a separate 30-item split.
 
-A later cross-validation implementation reports pooled out-of-fold predictions and fold-level variation. However, its training wrapper supplies the outer test fold as both validation and test data. The neural trainer selects the best checkpoint using validation macro-F1, so this exposes the outer evaluation labels to checkpoint selection. Its grouping also falls back to individual item IDs when the requested source-group column is absent. The corpus lacks that column, and individual item IDs do not protect the repeated source URLs. We have repaired the shared split logic to join declared groups, normalized URLs, and augmentation parents transitively; the historical neural runs still require rerunning. Tables~\ref{tab:text_models} and~\ref{tab:multimodal_models} retain the later saved summaries with these qualifications; they are not corrected-protocol results.
+A later cross-validation implementation reports pooled out-of-fold predictions and fold-level variation. However, its training wrapper supplies the outer test fold as both validation and test data. The neural trainer selects the best checkpoint using validation macro-F1, so this exposes the outer evaluation labels to checkpoint selection. Its grouping also falls back to individual item IDs when the requested source-group column is absent. The corpus lacks that column, and individual item IDs do not protect the repeated source URLs. We have repaired the shared split logic to join declared groups, normalized URLs, and augmentation parents transitively; Tables~\ref{tab:text_models} and~\ref{tab:multimodal_models} in Appendix~\ref{sec:historical} retain the historical summaries; they are not corrected-protocol results.
 
 \subsection{Corrected comparison protocol}\label{sec:experimental_setup}
 The required primary comparison uses the same original readable-image items, headline inputs, source groups, and outer folds for every text-only and multimodal model. Repeated source URLs must share a group; metadata conflicts require correction or conservative exclusion before the item list is frozen. Evaluation retains the natural label distribution.
 
-Within each outer training partition, a separate grouped validation partition selects neural checkpoints. The outer test partition is used only for final prediction. Any augmented headline is attached only if its parent belongs to the inner training partition. The published augmentation table contains 114 variants; neither validation nor test data should contain these variants. The code now provides independent inner validation, but source-group repair and corrected neural reruns remain pending. We do not present this specification as an already completed experiment.
+Within each outer training partition, a separate grouped validation partition selects neural checkpoints. The outer test partition is used only for final prediction. Any augmented headline is attached only if its parent belongs to the inner training partition. The published augmentation table contains 114 variants; neither validation nor test data should contain these variants. Section~\ref{sec:results} reports the experiment run under this specification.
 
-Every eligible original item must receive exactly one out-of-fold prediction. Runs should retain item IDs, fold assignments, model configuration, seed, code revision, and input provenance. A secondary all-headline evaluation can cover all 198 items, but its scores belong in a separate population table.
+Every eligible original item receives exactly one out-of-fold prediction, which the runner asserts. Runs retain item IDs, fold assignments, model configuration, seed, code revision, and an input checksum. The primary population is the 149 items whose image decodes; every text and vision--language model sees the same headlines, source groups, and outer folds. A secondary all-headline evaluation covers all 198 items for text models and is reported in a separate table.
+
+Configurations are those committed before the rerun and were not tuned on these results. Text encoders are fine-tuned for up to eight epochs. Vision--language backbones are frozen, with a trained fusion or classification head for up to ten epochs. All neural models use class-weighted cross-entropy and early stopping with patience~3 on inner-validation macro-F1. The CountVectorizer/ViT hybrid uses frozen ViT features \citep{dosovitskiy2021vit} and logistic regression. Each configuration runs once with seed~42 on a single NVIDIA T4 GPU; the whole sweep takes under an hour.
 
 \subsection{Metrics and uncertainty}
 The primary metric is macro-F1 over the three fixed labels. We report accuracy, per-class F1, pooled macro-F1, an item-level percentile bootstrap interval with 2,000 resamples, and the mean and sample standard deviation of fold macro-F1. Pooled F1 is not an arithmetic mean of fold F1. The bootstrap conditions on saved predictions; it does not measure retraining variability or label uncertainty. A corrected analysis should account for repeated source groups when resampling.
 
-An assessment of multimodal improvement requires paired predictions for identical items under identical training partitions, followed by a paired estimate of the macro-F1 difference. Overlap or non-overlap of separate confidence intervals is not a substitute for that analysis. Multiple-seed and outlet- or event-held-out evaluation would address additional generalization questions, but those experiments are not claimed here.
+Multimodal improvement is assessed with paired predictions for identical items under identical outer folds. We fixed the comparisons before seeing results: each vision--language model against two text references, TF-IDF/logistic regression and BanglaBERT. For each pair we report the difference in pooled macro-F1 and a percentile interval from 2,000 bootstrap resamples of source groups rather than items, so items sharing a source are resampled together. Multiple-seed and outlet- or event-held-out evaluation are not performed.
 
-\section{Exploratory Results}\label{sec:results}
-The following scores are transcribed from the newer saved manuscript and its result summaries. They are preserved to make the experimental history reviewable; they have not been reproduced under the corrected checkpoint-selection and source-grouping protocol.
+\section{Results}\label{sec:results}
+All scores in this section come from one sweep of the committed configurations (\texttt{scripts/run\_matched\_sweep.py}); tables are generated by \texttt{scripts/matched\_analysis.py}. The historical scores of earlier protocols are in Appendix~\ref{sec:historical}.
 
 \begin{table*}[t]
 \footnotesize
 \centering
-\caption{Exploratory text results transcribed from the saved Overleaf result summary ($n=198$). These runs predate the independent-validation and duplicate-source-group corrections; they are retained for traceability and require rerunning. F1 is pooled macro-F1; fold is mean $\pm$ sample standard deviation. The subscripts gc and gl denote government-critique and government-leaning.}
+\caption{Matched comparison on the 149 readable-image items ($n=149$, one source-grouped five-fold split shared by every model, headline input, inner-validation checkpoint selection for neural models, seed~42). F1 is pooled out-of-fold macro-F1 with a 95\% item-bootstrap interval; ``Fold'' is mean $\pm$ sample standard deviation of fold macro-F1. The last three columns are per-class F1 for government-critique, neutral, and government-leaning. The majority baseline predicts one class for every item.}
+\begin{tabular}{llccccccc}
+\toprule
+\textbf{Model} & \textbf{Input} & \textbf{Acc.} & \textbf{Macro-F1} & \textbf{95\% CI} & \textbf{Fold} & \textbf{F1\textsubscript{gc}} & \textbf{F1\textsubscript{neu}} & \textbf{F1\textsubscript{gl}} \\
+\midrule
+\RowsPaired
+\bottomrule
+\end{tabular}
+\label{tab:matched}
+\end{table*}
+
+\begin{table}[t]
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\centering
+\caption{Paired macro-F1 difference (vision--language minus text reference) on the 149 matched items and identical outer folds. Intervals resample 148 source groups 2,000 times. ``$P(\Delta>0)$'' is the share of resamples with a positive difference.}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+\textbf{VL model} & \textbf{Reference} & $\boldsymbol{\Delta}$ & \textbf{95\% CI} & $P(\Delta>0)$ \\
+\midrule
+\RowsPairedDiff
+\bottomrule
+\end{tabular}}
+\label{tab:paired}
+\end{table}
+
+\subsection{Matched readable-image comparison}
+Table~\ref{tab:matched} reports all thirteen models on the same 149 items. % source: reports/submission/matched.json
+The character n-gram TF-IDF classifier has the highest pooled macro-F1, 0.543 (0.457--0.619), against a majority floor of 0.217. Among fine-tuned encoders, mBERT reaches 0.446, and BanglaBERT, Bangla-ELECTRA, mT5, and XLM-RoBERTa range from 0.344 to 0.380. Among vision--language models, the CountVectorizer/ViT hybrid is highest at 0.425, followed by CLIP at 0.387; BLIP, ALIGN, ViLT, and FLAVA range from 0.325 to 0.361. No model other than the majority floor collapses to a single class. Fold standard deviations of 0.05--0.14 show that a single five-fold run cannot rank models separated by a few points.
+
+\subsection{Paired multimodal differences}
+Table~\ref{tab:paired} gives the pre-specified paired comparisons. % source: reports/submission/matched.json, paired_differences
+Against TF-IDF, all six vision--language models score lower, from $-0.117$ for CountVectorizer/ViT to $-0.218$ for FLAVA, and every source-group interval excludes zero. Against BanglaBERT, the differences range from $-0.042$ to $+0.058$ and every interval includes zero. The comparisons are not image ablations: each pair also differs in text representation. They show that, on this sample, no tested way of adding the photograph produced a classifier better than a headline-only one, and that the frozen vision--language models are indistinguishable from fine-tuned BanglaBERT.
+
+\subsection{All-headline text evaluation}
+Table~\ref{tab:all_headlines} covers all 198 items for text models. % source: reports/submission/matched.json
+TF-IDF (0.496, 0.415--0.569) and mBERT (0.491, 0.416--0.564) are close; XLM-RoBERTa, BanglaBERT, Bangla-ELECTRA, and mT5 range from 0.342 to 0.383, and the majority floor is 0.228. BanglaBERT is 0.366 on all 198 items and 0.367 on the 149-item subset. The TF-IDF difference between populations (0.496 vs.\ 0.543) reflects a change of items, not of input.
+
+\begin{table*}[t]
+\footnotesize
+\centering
+\caption{Secondary all-headline evaluation of text models ($n=198$; same protocol as Table~\ref{tab:matched}, with folds drawn over all items). This population differs from Table~\ref{tab:matched} and is not compared with vision--language models.}
+\begin{tabular}{llccccccc}
+\toprule
+\textbf{Model} & \textbf{Input} & \textbf{Acc.} & \textbf{Macro-F1} & \textbf{95\% CI} & \textbf{Fold} & \textbf{F1\textsubscript{gc}} & \textbf{F1\textsubscript{neu}} & \textbf{F1\textsubscript{gl}} \\
+\midrule
+\RowsAll
+\bottomrule
+\end{tabular}
+\label{tab:all_headlines}
+\end{table*}
+
+\subsection{Relation to historical scores}
+The historical summary reported BanglaBERT at 0.533 on 198 items (Table~\ref{tab:text_models}); the corrected run gives 0.366. % source: reports/submission/matched.json
+The two runs differ in several ways at once. The corrected run selects checkpoints without the outer test fold, trains on roughly 80\% of each outer training partition, and fixes the input to the headline field with repaired source groups. We do not attribute the drop to any single change. Checkpoint selection is itself noisy here: inner validation partitions contain 25 items on the matched population and 33 on all headlines, and early stopping ended 65 of 75 neural fold runs, 29 of them at epoch 1 or 2. % source: reports/submission/early_stopping.json, cv.json folds
+The fine-tuned encoders are therefore likely under-trained relative to what a larger validation set would select; this run does not test that.
+
+\section{Discussion}
+The audit changes what the evidence can support. First, direct overlap with BanglaBias requires attribution and a clear distinction between inherited article data and any additional image collection or annotations. The 53 unmatched rows and annotation procedures still require documentation before a resource-novelty claim.
+
+Second, the matched rerun does not support a multimodal advantage. The strongest classifier uses only the headline, and the frozen vision--language models do no better than a fine-tuned text encoder. Two reasons are compatible with this result and are not separated here: the vision--language text encoders were not pretrained for Bangla, and 149 items may be too few to learn a useful image--text interaction with frozen backbones. The modality-label disagreement (72 of 152 items) shows that annotators sometimes read the photograph differently from the text, but these models do not convert that difference into better prediction of the final item label.
+
+Third, a common cross-validation label is insufficient to establish comparability. Every historical text score is higher than its corrected all-headline counterpart (Tables~\ref{tab:text_models} and~\ref{tab:all_headlines}). Removing test-informed checkpoint selection and equalizing populations changed both the absolute scores and the ranking, with a linear baseline moving from second place to first.
+
+Finally, claims that tokenizers render Bangla text unusable, photographs are merely decorative, or a particular fusion architecture explains a gain would require direct diagnostics or controlled ablations. The historical zero-shot LLM summary lacks a matched item population and verified response provenance; it is omitted.
+
+\section{Conclusion}
+We audited the lineage and evaluation of a Bangla news stance collection containing reused BanglaBias items and image-associated records, and reran thirteen models under one corrected, matched protocol. The annotation tables show uneven annotator coverage and substantial disagreement between modality-specific labels. The historical experiments contained augmentation leakage, outer-test checkpoint selection, and unequal populations. Under the corrected protocol, a character n-gram headline classifier outperforms every vision--language model in paired comparisons, and no tested model shows a reliable gain from the photograph.
+
+\section*{Limitations}
+The sample is small and imbalanced, with 39 outlet keys and uneven image availability. Each configuration was run once with one seed and one fold assignment, and hyperparameters were taken from committed configurations without tuning; other seeds, learning rates, unfrozen vision--language backbones, or larger validation sets could change individual scores. Inner validation sets of 25--33 items make checkpoint selection noisy. The paired comparisons confound image use with text representation and are not ablations. Exact lineage for unmatched items, the intended stance target in different political periods, image-collection procedures, annotation instructions, adjudication, consent, and compensation need original study records. The removal of two raw items and several metadata exceptions remain unresolved.
+
+Source-URL grouping alone does not eliminate shared event, outlet, or visual information. Readable-image availability can be selective. Item-bootstrap intervals in Tables~\ref{tab:matched} and~\ref{tab:all_headlines} do not represent training or annotation uncertainty. Outlet- or event-held-out evaluation was not performed.
+
+\section*{Ethical Considerations}
+The labels concern annotated framing of individual items, not factual correctness or a normative assessment of a publisher. Political stance is context-sensitive, and disagreement should be retained and documented rather than hidden by an assumed adjudication rule. The measured pairwise agreement does not establish representative annotator viewpoints or absence of bias.
+
+The upstream BanglaBias dataset must be credited. Its dataset card lists an MIT license, but that does not establish permissions for added third-party photographs, recovered article content, or new annotations. Any release should distinguish code, annotations, source links, and copyrighted content, and document their respective terms. We do not claim that publication of news content establishes consent or unrestricted reuse. Automated stance predictions should not be treated as evidence sufficient for censorship, political targeting, or publisher sanctions.
+
+\bibliography{custom}
+\appendix
+\section{Historical Restricted Scores and Ablations}\label{sec:historical}
+The tables in this appendix preserve earlier point estimates, transcribed from the saved summaries, for traceability. They were produced under the historical protocols described in Section~\ref{sec:methods} and are superseded by Section~\ref{sec:results}.
+\begin{table*}[ht]
+\footnotesize
+\centering
+\caption{Historical text results transcribed from the saved result summary ($n=198$). These runs predate the independent-validation and duplicate-source-group corrections; they are retained for traceability and superseded by Table~\ref{tab:all_headlines}. F1 is pooled macro-F1; fold is mean $\pm$ sample standard deviation. The subscripts gc and gl denote government-critique and government-leaning.}
 \begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
 \textbf{Model} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{95\% CI} & \textbf{Per-fold} & \textbf{F1\textsubscript{gc}} & \textbf{F1\textsubscript{gl}} \\
@@ -134,10 +224,10 @@ Majority baseline & 0.520 & 0.228 & 0.207--0.248 & 0.228 $\pm$ 0.002 & 0.684 & 0
 \label{tab:text_models}
 \end{table*}
 
-\begin{table*}[t]
+\begin{table*}[ht]
 \footnotesize
 \centering
-\caption{Exploratory vision--language results in the saved summary ($n=86$). This historical image population differs from the current readable-image population. These scores do not establish a matched comparison with Table~\ref{tab:text_models}. Corrected runs are pending.}
+\caption{Historical vision--language results in the saved summary ($n=86$). This historical image population differs from the current readable-image population. These scores do not establish a matched comparison; corrected runs are in Table~\ref{tab:matched}.}
 \begin{tabular}{|l|l|c|c|c|c|c|c|}
 \hline
 \textbf{Model} & \textbf{Family} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{95\% CI} & \textbf{Per-fold} & \textbf{F1\textsubscript{gc}} & \textbf{F1\textsubscript{gl}} \\
@@ -153,46 +243,6 @@ FLAVA         & fusion enc.   & 0.395 & 0.297 & 0.222--0.368 & 0.232 $\pm$ 0.051
 \label{tab:multimodal_models}
 \end{table*}
 
-
-\subsection{Text and vision--language summaries}
-The saved text summary has $n=198$ and a BanglaBERT point estimate of macro-F1~0.533. TF-IDF/logistic regression and mBERT score 0.501 and 0.498. These figures motivate retaining a linear baseline in future comparisons, but they do not establish a robust ranking or identify the causal effect of language-specific pretraining.
-
-The vision--language summary covers $n=86$ and has CLIP and ALIGN point estimates of 0.516 and 0.482. The wide intervals and large fold variation indicate considerable conditional uncertainty. These values cannot be compared directly with the full-corpus text scores. Class-level zeros, such as FLAVA's government-leaning F1, describe failures in those saved predictions; they do not establish a limitation inherent to an architecture.
-
-\subsection{Restricted re-scoring and ablations}
-The earlier restricted text re-score includes 87 image-associated items, compared with 86 in the vision--language table. It filters predictions from text models trained on the full-corpus folds and therefore changes neither their training population nor their checkpoint-selection procedure. Table~\ref{tab:text_on_image_subset} in Appendix~\ref{sec:historical} preserves this descriptive re-score without claiming a matched comparison.
-
-Appendix~\ref{sec:historical} also retains the historical ablation point estimates. Equal rounded scores with and without augmentation do not establish that augmentation has no effect; positive differences after unfreezing encoders do not establish reliable improvement. Those conclusions require verified input/configuration changes and paired reruns. Previously quoted significance tests and aggregate error counts are not used as final evidence because the underlying evaluation issues remain unresolved.
-
-\subsection{Fresh headline baseline diagnostics}
-A corrected local headline-only diagnostic gives TF-IDF macro-F1~0.496 (95\% item-bootstrap interval 0.415--0.569, $n=198$) and 0.543 (0.457--0.619, $n=149$ readable-image items). Its corresponding original-frequency majority floors are 0.228 and 0.217. These reruns use repaired source grouping and the verified URL correction; augmentation is attached only to training parents. The difference between their two TF-IDF scores is a population difference, not an image benefit: both classifiers use text alone.
-
-\section{Discussion}
-The audit changes what the evidence can support. First, direct overlap with BanglaBias requires attribution and a clear distinction between inherited article data and any additional image collection or annotations. The 53 unmatched rows and annotation procedures still require documentation before a resource-novelty claim.
-
-Second, modality-label disagreement is an informative descriptive property, but it is not a performance result. It motivates investigating when text and image views diverge while leaving open whether the disagreement is reliable, relevant to the final item label, and learnable from this sample.
-
-Third, a common cross-validation label is insufficient to establish comparability. The same eligibility list, source grouping, fold assignment, checkpoint-selection boundary, and annotation target are needed. Subset re-scoring and confidence intervals do not repair unequal training populations or test-informed checkpoint selection.
-
-Finally, claims that tokenizers render Bangla text unusable, photographs are merely decorative, or a particular fusion architecture explains a gain require direct diagnostics or controlled ablations. The available aggregate results do not establish those mechanisms. The historical zero-shot LLM summary also lacks a matched item population and independently verified response/model provenance in this audit; it is omitted from the main comparison rather than used to explain task difficulty.
-
-\section{Conclusion}
-We audited the lineage and evaluation of a Bangla news stance collection containing reused BanglaBias items and image-associated records. The annotation tables show uneven annotator coverage and substantial disagreement between modality-specific labels. The experimental record reveals augmentation leakage in the original text split, outer-test checkpoint selection in a later cross-validation implementation, and unequal model populations. Correcting these controls is necessary before claiming a reliable multimodal gain. The next experimental stage is a matched, source-grouped comparison with independent validation and saved out-of-fold predictions.
-
-\section*{Limitations}
-This is a revision-stage audit with exploratory model summaries, not a completed corrected benchmark. The sample is small and imbalanced, with 39 outlet keys and uneven image availability. Exact lineage for unmatched items, the intended stance target in different political periods, image-collection procedures, annotation instructions, adjudication, consent, and compensation need original study records. The removal of two raw items and several metadata exceptions remain unresolved.
-
-Source-URL grouping alone does not eliminate shared event, outlet, or visual information. Readable-image availability can be selective, and article recovery is source-dependent. Item-bootstrap intervals do not represent training or annotation uncertainty. A definitive negative result about multimodal learning cannot be drawn from unmatched or test-selected historical experiments.
-
-\section*{Ethical Considerations}
-The labels concern annotated framing of individual items, not factual correctness or a normative assessment of a publisher. Political stance is context-sensitive, and disagreement should be retained and documented rather than hidden by an assumed adjudication rule. The measured pairwise agreement does not establish representative annotator viewpoints or absence of bias.
-
-The upstream BanglaBias dataset must be credited. Its dataset card lists an MIT license, but that does not establish permissions for added third-party photographs, recovered article content, or new annotations. Any release should distinguish code, annotations, source links, and copyrighted content, and document their respective terms. We do not claim that publication of news content establishes consent or unrestricted reuse. Automated stance predictions should not be treated as evidence sufficient for censorship, political targeting, or publisher sanctions.
-
-\bibliography{custom}
-\appendix
-\section{Historical Restricted Scores and Ablations}\label{sec:historical}
-The tables in this appendix preserve earlier point estimates for traceability. They do not override the population and checkpoint-selection qualifications in Sections~\ref{sec:methods}--\ref{sec:results}.
 \begin{table}[ht]
 \footnotesize
 \setlength{\tabcolsep}{3pt}
