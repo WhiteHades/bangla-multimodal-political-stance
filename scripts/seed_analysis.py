@@ -105,7 +105,7 @@ def main():
         {"roots": [str(r) for r in args.roots], "runs": runs, "paired_differences": diffs,
          "models": models.to_dict("records"), "pairs": pairs.to_dict("records")},
         indent=2, default=lambda v: v.item() if isinstance(v, np.generic) else str(v)) + "\n")
-    (args.dest / "seeds.md").write_text("\n".join(lines) + "\n")
+    (args.dest / "seeds.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     (args.dest / "seeds_tables.tex").write_text("\n".join(tex) + "\n")
     print("\n".join(lines))
 
