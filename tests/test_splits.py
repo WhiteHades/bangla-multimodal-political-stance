@@ -74,6 +74,7 @@ def test_source_url_connects_different_declared_groups():
     cfg = DataConfig.load()
     cfg.split = dict(cfg.split, augment_train=False)
     splits = make_splits(corpus, cfg, write=False)
-    memberships = {row.item_id: name for name, frame in splits.items()
-                   for row in frame.itertuples()}
+    memberships = {
+        row.item_id: name for name, frame in splits.items() for row in frame.itertuples()
+    }
     assert memberships["Image_0_0"] == memberships["Image_1_0"]

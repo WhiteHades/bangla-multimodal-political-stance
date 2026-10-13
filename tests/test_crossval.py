@@ -61,11 +61,13 @@ def test_fold_count_must_allow_held_out_groups():
 
 
 def test_duplicate_urls_stay_together_without_source_index():
-    corpus = pd.DataFrame({
-        "item_id": [f"item{i}" for i in range(30)],
-        "label": np.arange(30) % 3,
-        "source_url": [f"https://news.example/story/{i}" for i in range(30)],
-    })
+    corpus = pd.DataFrame(
+        {
+            "item_id": [f"item{i}" for i in range(30)],
+            "label": np.arange(30) % 3,
+            "source_url": [f"https://news.example/story/{i}" for i in range(30)],
+        }
+    )
     corpus.loc[1, "source_url"] = corpus.loc[0, "source_url"] + "#photo"
     corpus.loc[1, "label"] = corpus.loc[0, "label"]
     folds = make_folds(corpus)

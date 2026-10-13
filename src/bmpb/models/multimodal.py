@@ -16,6 +16,12 @@ from bmpb.config import ExperimentConfig
 from bmpb.models.registry import register
 
 
+def _pooled(out):
+    """Pooled vector from a transformers ModelOutput, falling back to the [CLS] state."""
+    pooled = getattr(out, "pooler_output", None)
+    return pooled if pooled is not None else out.last_hidden_state[:, 0]
+
+
 @register("clip_like")
 def clip_like(cfg: ExperimentConfig):
     """Dual-encoder models with a joint processor: CLIP and ALIGN.
@@ -58,9 +64,9 @@ def clip_like(cfg: ExperimentConfig):
             image_out = self.backbone.get_image_features(pixel_values=pixel_values)
             # Newer transformers may return ModelOutput instead of a plain tensor.
             if not isinstance(text_out, torch.Tensor):
-                text_out = text_out.pooler_output if hasattr(text_out, "pooler_output") and text_out.pooler_output is not None else text_out.last_hidden_state[:, 0]
+                text_out = _pooled(text_out)
             if not isinstance(image_out, torch.Tensor):
-                image_out = image_out.pooler_output if hasattr(image_out, "pooler_output") and image_out.pooler_output is not None else image_out.last_hidden_state[:, 0]
+                image_out = _pooled(image_out)
             return self.head(text_out, image_out)
 
     return DualEncoderClassifier(), processor

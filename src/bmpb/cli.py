@@ -160,9 +160,7 @@ def significance(
 
     frame = run_significance(runs, out)
     n_sig = int(frame["boot_sig"].sum()) if len(frame) else 0
-    console.print(
-        f"[green]{len(frame)}[/] pairs tested, [bold]{n_sig}[/] significant (p<0.05)"
-    )
+    console.print(f"[green]{len(frame)}[/] pairs tested, [bold]{n_sig}[/] significant (p<0.05)")
 
 
 @app.command("error-analysis")

@@ -19,7 +19,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import f1_score
 
 from bmpb.paths import EXPERIMENTS, TABLES
 from bmpb.utils.logging import get_logger
@@ -54,8 +53,8 @@ def mcnemar_test(y_true: np.ndarray, pred_a: np.ndarray, pred_b: np.ndarray):
 
     Returns (chi2, p_value, contingency dict).
     """
-    correct_a = (pred_a == y_true)
-    correct_b = (pred_b == y_true)
+    correct_a = pred_a == y_true
+    correct_b = pred_b == y_true
 
     # b: A wrong, B right; c: A right, B wrong
     b = int(np.sum(~correct_a & correct_b))
@@ -68,6 +67,7 @@ def mcnemar_test(y_true: np.ndarray, pred_a: np.ndarray, pred_b: np.ndarray):
     chi2 = (abs(b - c) - 1) ** 2 / (b + c) if (b + c) >= 25 else None
 
     from scipy.stats import binomtest
+
     p_value = binomtest(b, b + c, 0.5).pvalue
 
     if chi2 is None:
@@ -115,7 +115,9 @@ def paired_bootstrap_f1(
     for i in range(rounds):
         idx = rng.integers(0, n, n)
         yt = y_true[idx]
-        deltas[i] = _fast_macro_f1(yt, pred_a[idx], n_classes) - _fast_macro_f1(yt, pred_b[idx], n_classes)
+        deltas[i] = _fast_macro_f1(yt, pred_a[idx], n_classes) - _fast_macro_f1(
+            yt, pred_b[idx], n_classes
+        )
 
     ci_low = float(np.percentile(deltas, 2.5))
     ci_high = float(np.percentile(deltas, 97.5))
@@ -137,9 +139,7 @@ def paired_bootstrap_f1(
     }
 
 
-def run_significance(
-    runs_dir: Path = EXPERIMENTS, out_dir: Path = TABLES
-) -> pd.DataFrame:
+def run_significance(runs_dir: Path = EXPERIMENTS, out_dir: Path = TABLES) -> pd.DataFrame:
     """Run pairwise significance tests on all CV model pairs.
 
     Models are grouped by population (n=198 text vs n=86 multimodal) since
@@ -180,22 +180,24 @@ def run_significance(
             # Paired bootstrap
             boot = paired_bootstrap_f1(y_true, pred_a, pred_b)
 
-            rows.append({
-                "model_a": name_a,
-                "model_b": name_b,
-                "n": len(shared),
-                "f1_a": boot["f1_a"],
-                "f1_b": boot["f1_b"],
-                "delta": boot["delta"],
-                "boot_ci_low": boot["ci_low"],
-                "boot_ci_high": boot["ci_high"],
-                "boot_p": boot["p_value"],
-                "boot_sig": boot["significant_005"],
-                "mcnemar_b": cont["b"],
-                "mcnemar_c": cont["c"],
-                "mcnemar_p": round(mcn_p, 4),
-                "mcnemar_sig": mcn_p < 0.05,
-            })
+            rows.append(
+                {
+                    "model_a": name_a,
+                    "model_b": name_b,
+                    "n": len(shared),
+                    "f1_a": boot["f1_a"],
+                    "f1_b": boot["f1_b"],
+                    "delta": boot["delta"],
+                    "boot_ci_low": boot["ci_low"],
+                    "boot_ci_high": boot["ci_high"],
+                    "boot_p": boot["p_value"],
+                    "boot_sig": boot["significant_005"],
+                    "mcnemar_b": cont["b"],
+                    "mcnemar_c": cont["c"],
+                    "mcnemar_p": round(mcn_p, 4),
+                    "mcnemar_sig": mcn_p < 0.05,
+                }
+            )
 
     frame = pd.DataFrame(rows)
     if frame.empty:
@@ -216,7 +218,8 @@ def run_significance(
         "and McNemar's exact test on error disagreement. Only models evaluated on",
         "the same items are compared. Significance at p < 0.05.",
         "",
-        "| Model A | Model B | n | F1(A) | F1(B) | Delta | 95% CI | Boot p | Sig | McNemar p | Sig |",
+        "| Model A | Model B | n | F1(A) | F1(B) | Delta | 95% CI "
+        "| Boot p | Sig | McNemar p | Sig |",
         "| --- | --- | ---: | ---: | ---: | ---: | --- | ---: | --- | ---: | --- |",
     ]
     for r in frame.itertuples():
@@ -232,11 +235,13 @@ def run_significance(
     n_sig_boot = int(frame["boot_sig"].sum())
     n_sig_mcn = int(frame["mcnemar_sig"].sum())
     n_total = len(frame)
-    lines.extend([
-        "",
-        f"**{n_sig_boot}/{n_total}** pairs significant by bootstrap, "
-        f"**{n_sig_mcn}/{n_total}** by McNemar (p < 0.05).",
-    ])
+    lines.extend(
+        [
+            "",
+            f"**{n_sig_boot}/{n_total}** pairs significant by bootstrap, "
+            f"**{n_sig_mcn}/{n_total}** by McNemar (p < 0.05).",
+        ]
+    )
 
     md_path = out_dir / "significance.md"
     md_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
