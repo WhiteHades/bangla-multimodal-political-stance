@@ -27,6 +27,9 @@ incomplete run is not accepted as completed, and a new run keeps the older
 directory. A malformed metadata document fails visibly rather than being
 silently treated as a successful experiment. These checks prevent accidental
 reuse; they are not a signature or proof against deliberate alteration.
+Resume restores summary fields from the verified `cv.json` before skipping
+training. A regression check reproduced the earlier failure with an altered
+summary score, then confirmed that resume repairs it without adding a run.
 
 The analysis scripts load the exact referenced artifacts and check their
 checksums and summary fields. Pairing requires the same examples, labels,
