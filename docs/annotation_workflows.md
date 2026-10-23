@@ -12,6 +12,21 @@ item, with `item_id`, `headline`, `outlet`, `date`, `source_url`, numeric
 It does not store image judgements, flags, notes, or a vote from another
 annotator. The output is not accepted by `bmpb merge-annotations`.
 
+Before resuming, the script checks the saved header, row width, item IDs,
+label IDs, and agreement between each label ID and label name. A malformed
+file or conflicting labels for the same ID stop the command before dataset
+loading or appending. A row with an
+empty label and label name remains pending. The command does not repair or
+relabel existing records.
+
+The local check uses synthetic CSV files and needs no dataset download:
+
+```sh
+mkdir -p .tmp
+rustc --edition=2021 checks/annotations.rs -o .tmp/check_annotations
+.tmp/check_annotations .venv/bin/python
+```
+
 ## Artifact desk export and merge
 
 `bmpb merge-annotations --export DIR` expects JSON under `DIR/items/` and
