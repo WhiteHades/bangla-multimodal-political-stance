@@ -1,3 +1,21 @@
+## 23 October 2026, Codex, review preparation
+
+Done: added report checks and run identity validation, corrected model and data
+tools, and revised manuscript claims against saved evidence. Recovered image
+files remain local. The evidence and repeat procedures are in
+`docs/evidence_status.md`, `docs/input_recovery.md`, and `docs/run_verification.md`.
+`docs/replication_protocol.md` proposes a study that has not run.
+
+Verified: report arithmetic, four original text baselines, input hashes and
+image decoding, Rust checks, and full pretrained BLIP CPU and GPU probes.
+GitHub CI passed lint, formatting, Python tests, and imports on all four PRs.
+The revised manuscript compiled. Historical numerical reports remain unchanged.
+
+Open: historical image identity, original neural predictions, independent
+Bangla annotation review, the proposed dataset comparison, Colab execution,
+and the real unannotated export. No local Python test runner was used.
+The author must decide scientific framing and whether to adopt the study.
+
 ## 2026-10-12 · Claude (Opus 5.5, Claude Code) · agent/experiments-grouped-evaluation (seeds)
 
 Done: the author asked for a multi-seed rerun on Colab. Added `--seed` to
