@@ -185,10 +185,12 @@ A failed condition cannot be replaced by a historical score. Record failures
 and stop the affected comparison. The same rule applies if numerical warnings
 leave one condition incomplete.
 
-Do not execute the study until its implementation and configuration are reviewed
-and the user authorizes the required compute. No GPU work or data transfer is
-part of the current task. Narrowing the manuscript claim can make this study
-unnecessary.
+The user has authorized new local GPU work that preserves historical artifacts.
+The BLIP implementation check passed on the local GPU, as recorded in
+`docs/run_verification.md`. The proposed comparison still needs a reviewed
+implementation and configuration before execution. Paid compute and external
+data transfer remain outside the approved scope. Narrowing the manuscript claim
+can make this study unnecessary.
 The planned work is one image feature extraction over 149 files and 75 linear
 classifier fits, from three conditions, five folds, and five fold assignments.
 No tuning search is included. Runtime and cost have not been measured. Measure
