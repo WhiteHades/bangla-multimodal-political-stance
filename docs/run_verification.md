@@ -74,6 +74,9 @@ the notebook rejects an edited checkout and accepts a clean checkout.
 The checks below need the data and analysis dependencies already used by the
 project. They use synthetic records for the experiment flow and do not load
 original news content or pretrained model weights.
+The report check requires files from
+[the evidence PR](https://github.com/kishormorol/bangla-multimodal-political-stance/pull/2).
+The experiment check is included in the model PR.
 
 ```sh
 mkdir -p .tmp
