@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata
+import inspect
 import json
 import os
 import platform
@@ -370,7 +371,10 @@ def main():
                     samples[:, column], [2.5, 97.5]
                 ).tolist()
                 scores[name]["interval_unit"] = "source group, conditional on saved predictions"
-            difference = paired_difference(predictions["B"], predictions["A"])
+            paired_options = {}
+            if "groups" in inspect.signature(paired_difference).parameters:
+                paired_options["groups"] = frame.set_index("item_id")["group"]
+            difference = paired_difference(predictions["B"], predictions["A"], **paired_options)
             independent_interval = np.percentile(samples[:, 1] - samples[:, 0], [2.5, 97.5])
             if not np.array_equal(independent_interval, difference["ci95"]):
                 raise ValueError("independent group bootstrap disagrees with the paired helper")
