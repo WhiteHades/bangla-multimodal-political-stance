@@ -1,3 +1,179 @@
+## 23 October 2026, Codex, replication readiness and review units
+
+Done: recovered current public image files for all 149 saved paired identifiers
+without overwriting the existing raw mirror or input manifest. The selected
+snapshot has 122 processed images and 27 originals. It is stored privately in
+`data/interim/replication_inputs_20261023/`. Per file retrieval records remain
+in `data/interim/replication_recovery_20261023.json`. The aggregate evidence is
+`reports/verification/input_recovery.json` and `docs/input_recovery.md`.
+
+The processed image table has 149 identifiers but shares only 122 with the
+saved evaluation population. All 13 paired report entries agree on the saved
+149 identifiers and folds. The new files fully decode, with no exact byte or
+decoded pixel duplicates. The saved headline checksum and seed 42 folds
+reproduce, with 148 source groups. None of those checks proves historical
+image byte identity, semantic pairing, or event independence.
+
+Prepared the ordered review units described in `docs/review_branches.md`.
+The branches are `agent/review-01-evidence`, `agent/review-02-experiments`,
+`agent/review-03-data`, and `agent/review-04-paper`. Each review base is the
+preceding branch; the first starts at `a935d11`. The original integrated branch
+and full development history remain available. The default branch and
+historical numerical reports remain unchanged.
+
+Verified: the evidence branch passed its Rust report check, including rejection
+of corrupted score and image count copies. The experiment branch passed its
+Rust synthetic flow check. A clean checkout restored the new private bundle
+and verified 198 records and 156 file states. The original snapshot still
+verified its 198 records and 106 file states. Data export preserved all 198
+canonical titles and labels with 149 decoded images. Ruff and Black passed on
+46 relevant Python files, and notebook JSON and plain Python cells parsed.
+No full Python test runner was used, as required by workspace instructions.
+
+`docs/replication_protocol.md` is a proposal for the same character text features
+alone, with fixed image features, and image features alone. It fixes the text
+field, current input bundle, model revision, preprocessing, classifier settings,
+primary seed, sensitivity folds, metrics, conditional uncertainty, decision
+rules, and cancellation conditions. Independent review led to more explicit
+preprocessing and analysis rules. The proposed work is 149 feature extractions
+and 75 linear classifier fits. Runtime is unmeasured. No new study has run.
+
+Not verified: historical image bytes and neural predictions, semantic image
+pairing, original annotation procedures, full pretrained BLIP, GPU or Colab
+execution, the real unannotated export, and submission page limits. Shared
+source components do not prove independence across events or outlets. The
+current data has already supported development and is not an untouched test
+set. Mantis fetched successfully but its local checkout still could not fast
+forward; its existing guidance was used without changing that checkout.
+
+Needs the author: review the scientific framing and decide whether a new study
+is needed. Independent Bangla review and original annotation records remain
+necessary for semantic claims. A meaningful effect threshold needs a stated
+reason before new predictions are inspected. No upstream PR, default branch
+merge, communication, dataset publication, data upload, or GPU work occurred.
+
+## 23 October 2026, Codex, completed contribution work
+
+Done: integrated the review changes on `agent/review-integrated` and pushed
+logical commits. The evidence and initial manuscript branches are also
+available as `agent/review-evidence` and
+`agent/review-manuscript-corrections`. The default branch and historical
+numerical reports remain unchanged. No PR was opened or merged.
+
+The changes identify experiment inputs, model revisions, source code,
+software, groups, folds, augmentations, and exact saved artifacts. Resume and
+analysis reject incompatible or damaged runs. Macro F1 uses the frozen label
+set. BLIP now loads the retrieval architecture and uses image conditioned
+text features. Annotation format instructions and local dataset export are
+corrected. The downloader selects top level CSV files for the CSV only path.
+The current Colab notebook requires a clean pinned checkout and a verified
+input manifest. Older notebooks are marked as historical workflows.
+
+Verified: five public source CSVs were recovered locally. `Dataset.csv`
+matches the checksum in the committed provenance audit. The original
+implementation at `a935d11` reproduced four baseline results exactly, including
+folds, confusion matrices, point scores, and bootstrap intervals. Aggregate
+evidence and source checksums are in
+`reports/verification/original_baselines.json`. Recovered source data and raw
+reproduction outputs remain ignored and local.
+
+The report checker verified 20 matched scores, 100 seed scores, and 60 paired
+comparisons. Both Rust checks passed. The experiment check uses synthetic
+records and covers changed inputs, resume, corruption, preserved outputs,
+aggregation, duplicate seeds, and recorded offline failures. Direct CPU probes
+checked tiny BLIP retrieval checkpoints under Transformers 4.40.0 and 4.44.2,
+including image sensitivity and frozen encoder gradients. Export probes
+checked headlines, labels, missing images, and truncated image rejection.
+Downloader probes checked CSV selection, resume, and failure status.
+
+Ruff and Black passed on 46 relevant Python files. Notebook JSON and plain
+Python cells parsed. The pinned notebook commit was fetched from its public
+source. A direct fixture checked dirty and clean checkout handling. Independent
+reviews found an offline revision issue and a dirty notebook checkout issue;
+both were reproduced and corrected. The final Tectonic build produced nine
+pages with no overflow or undefined references. Rendered pages were inspected.
+Underfull boxes and local font configuration warnings remain. Submission page
+limits were not checked.
+
+`docs/research_evidence.md` records targeted primary reading, six academic
+queries, 36 results representing 30 unique papers, and task differences that
+exclude automatic dataset merging. Further study proposals are conditional
+on the named evidence gaps. They are not completed experiments.
+
+Not verified: GPU or Colab execution, full pretrained BLIP weights, the full
+existing Python test suite, complete local image recovery, and the real
+unannotated export source. Workspace rules prohibit Python test runners.
+The seed summary's original input identity and historical neural training
+remain unverified. Automated checks do not establish annotation meaning.
+The Mantis checkout refresh could not fast forward because its branches have
+diverged; the consulted guidance matched the fetched version.
+
+Needs the author: accept or revise scientific framing and the manuscript
+changes. Confirm annotation targets, dates, and adjudication history before
+new semantic claims. Independent Bangla review and any new controlled image
+study remain separate future work. Corrected scoring or BLIP experiments need
+new identified results. No dataset publication, data upload, paid compute,
+or communication with the research group was performed.
+
+## 23 October 2026, Codex, verified implementation changes
+
+Done: prepared run identity, exact artifact loading, compatible aggregation,
+consistent scoring, BLIP checkpoint and feature corrections, and annotation
+and export contract corrections on review branches. `docs/run_verification.md`
+describes the new metadata and checks. No historical report was overwritten.
+
+Verified: Rust checks exercise report arithmetic and a synthetic experiment
+flow, including resume, changed seed, artifact corruption, preserved old
+outputs, aggregate JSON, duplicate seeds, and per model offline failures.
+Direct CPU probes check BLIP under Transformers 4.40.0 and 4.44.2 with a tiny
+local retrieval checkpoint. Image changes affect logits, and frozen settings
+control encoder gradients. Model revisions resolve online or through cached
+offline config snapshots. Ruff and Black checks pass on affected code.
+
+Not verified: full pretrained BLIP weights, GPU training, and the full existing
+Python test suite. Workspace instructions prohibit Python test runners.
+Synthetic probes are not benchmark results. New scoring and BLIP behavior
+require separately identified future runs rather than replacement of old scores.
+
+Needs the author: scientific framing, annotation target and history, and any
+decision to include further experiments. No default branch merge, dataset
+publication, or message to the research group was performed.
+
+## 23 October 2026, Codex, factual manuscript corrections
+
+Done: separated the 149 item matched report from the 86 item seed comparison
+in `paper/latex/acl_latex.tex`. Corrected the seed table columns, the selected
+checkpoint description, and claims about intervals and image contribution.
+Updated README and manuscript guides to distinguish historical snapshots.
+Original numerical reports and historical tables are preserved.
+
+Verified: arithmetic through `scripts/verify_reports.py`. The manuscript
+builds with Tectonic 0.17.0. Its seed table was adjusted to fit the column.
+
+Not verified: historical training or seed input identity. BLIP's old feature
+path selects a separate text output; a corrected implementation needs new
+results and must not replace the old score without an identified run.
+
+Needs the author: final scientific framing. The changes describe the surviving
+evidence and do not establish new annotation ground truth or image benefit.
+
+## 23 October 2026, Codex, evidence verification
+
+Done: added `scripts/verify_reports.py`, `checks/reports.rs`, and
+`docs/evidence_status.md`. Historical reports are preserved. The older entry
+below predates the committed seed reports and is retained as history.
+
+Verified: summary arithmetic for 20 matched scores, 100 seed scores, and 60
+seed comparisons. The seed comparisons report 86 items and 85 source groups,
+whereas the matched report has a separate 149 item paired population.
+
+Not verified: original training, raw predictions, annotation semantics, and
+the relationship between the seed inputs and the matched inputs. A summary
+check does not establish those facts. No dataset was uploaded or published.
+
+Needs the author: interpretation of the contribution and any change to the
+study target. Engineering changes are prepared on review branches.
+
 ## 2026-10-12 · Claude (Opus 5.5, Claude Code) · agent/experiments-grouped-evaluation (seeds)
 
 Done: the author asked for a multi-seed rerun on Colab. Added `--seed` to
