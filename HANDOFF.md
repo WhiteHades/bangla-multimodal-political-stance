@@ -1,4 +1,4 @@
-## 2026 October 23, Codex, image contribution
+## 2026 October 23, Codex, completed review and image contribution
 
 Done: added `scripts/image_contribution.py`, its fixed configuration, one
 synthetic Rust check, and `docs/image_contribution.md`. Ran the comparison
@@ -6,21 +6,33 @@ locally on the frozen 149 item input bundle. The aggregate evidence is in
 `reports/verification/image_contribution.json`. Historical results and labels
 remain unchanged.
 
-Verified: all 75 fits finished. All 20 output artifact checksums and 156 input
-file checksums matched. A separate text run through the existing CV runner
+Verified: both the original run and a repeat from upstream main finished
+75 fits. Image feature bytes, all 15 prediction CSVs and every result matched
+exactly. Both sets of 20 artifact checksums matched. All 156 frozen input
+files were verified. A separate text run through the existing CV runner
 matched all 149 predictions. Independent calculations reproduced all five
 fold assignments' metrics and source group intervals. Adding images reduced
 primary macro F1 from 0.5642 to 0.4588, with a paired interval for the decrease
-of 0.0230 to 0.1812. The result concerns prediction of stored labels under the
-fixed configuration.
+of 0.0230 to 0.1812.
+
+Review: repaired sweep summary recovery, documentation links, and the
+manuscript's separate 86 item seed description. The combined checkout passed
+all four Rust behavior checks, Ruff, Black and import checks. The manuscript
+compiled to nine pages. The changed page was inspected. Spacing and local
+font warnings remain, with no overflow or undefined reference reported.
+The CPU CI workflow now includes the existing synthetic behavior checks.
 
 Not verified: historical image byte identity, label visibility, semantic image
 pairings, independent events or outlets, and performance on future news.
 The intervals condition on fitted predictions and omit model refitting.
+Upstream CI still requires maintainer approval. Colab execution and the
+complete export from the unavailable unannotated source remain unchecked.
 
 Needs the author: decide whether to adopt the result in the paper. The original
-data, image features, and item predictions remain local. No additional PR was
-opened for the experiment branch.
+data, image features, and item predictions remain local. The focused study is
+[upstream PR 6](https://github.com/kishormorol/bangla-multimodal-political-stance/pull/6).
+It targets main without including the companion PR's model changes. Proposed
+manuscript wording remains in `docs/image_contribution.md` for author review.
 
 ## 2026-10-12 · Claude (Opus 5.5, Claude Code) · agent/experiments-grouped-evaluation (seeds)
 

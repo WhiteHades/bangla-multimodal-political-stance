@@ -49,6 +49,8 @@ It checks that the added image block can affect predictions, that all three
 conditions score the same held out items, and that duplicate IDs or fold members
 are rejected without changing completed outputs. It does not run a model or
 produce a benchmark score.
+The existing CI workflow runs the synthetic checks with its normal Python
+environment, model downloads offline, and CUDA disabled.
 
 After the experiment, repeat the text condition through the existing CV runner
 with the same selected corpus, seed, folds, and augmentation disabled. Require
