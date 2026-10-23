@@ -134,6 +134,28 @@ The measured check took 18.12 seconds after download on this workstation.
 It used synthetic inputs, performed no optimizer steps, and produced no
 benchmark predictions. It does not verify GPU execution or training quality.
 
-The full existing Python test suite was not run because the workspace
-instructions prohibit Python test runners. The small Rust checks and direct
-runtime probes are separate evidence and do not claim that suite passed.
+The same checkpoint also passed a local CUDA check on a GTX 1650 Ti. The
+record is `reports/verification/pretrained_blip_gpu.json`. A batch of two
+synthetic images produced image dependent outputs and exactly matched the
+native retrieval features. CPU and GPU logits differed by at most
+`1.27e-7`, within absolute and relative tolerances of `1e-4`.
+One AdamW step updated the classifier with finite gradients, while the
+frozen backbone received no gradients. Peak reserved GPU memory was
+1,138,753,536 bytes. The GPU probe took 1.216 seconds after loading and moving
+the model. Neither the timing nor the memory figure describes a full study.
+
+To repeat the CUDA check, use the same converted checkpoint and synthetic
+inputs described above with Torch 2.5.1 and CUDA 12.4. Load the configuration
+with `ExperimentConfig.load`, seed Torch with 42, and build the wrapper once.
+Compare evaluation logits on CPU and CUDA before training. Check the native
+features and changed image response on CUDA, then switch to training mode.
+Use AdamW on trainable parameters with the configured learning rate and
+weight decay. Backpropagate cross entropy once with both synthetic labels
+set to zero, then require finite gradients and changed classifier weights.
+Do not interpret the synthetic loss as a stance result. Reset peak memory
+statistics after moving the model, and synchronize CUDA around timing.
+
+GitHub CI passed on all four review branches after Actions was activated on
+the fork. Its existing workflow ran lint, formatting, the Python tests, and
+the import check. No local Python test runner was used. The Rust checks and
+the CPU and GPU probes provide separate coverage.
