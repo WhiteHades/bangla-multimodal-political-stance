@@ -5,16 +5,15 @@ They form a stack. Each branch starts from the preceding branch, so its review
 diff contains only the next unit. The original integrated branch remains
 available. No default branch merge or upstream PR is part of this work.
 
-GitHub uses `tree` in a URL when displaying a branch. The slash in a branch
-name such as `agent/review-01-evidence` does not create a repository directory.
-The `agent/` prefix follows this repository's contribution instructions.
+The review branches use topic names at the contributor's request. Files remain
+in the existing source, scripts, checks, documentation, and paper directories.
 
 | Order | Review branch | Base | Scope |
 | :--- | :--- | :--- | :--- |
-| 1 | `agent/review-01-evidence` | `main` at `a935d11` | Summary checks, original baseline reproduction record, and recovered image input evidence |
-| 2 | `agent/review-02-experiments` | `agent/review-01-evidence` | Run identity, resume, aggregation, scoring, BLIP, and input verification |
-| 3 | `agent/review-03-data` | `agent/review-02-experiments` | Download behavior, annotation formats, local export, and dataset card corrections |
-| 4 | `agent/review-04-paper` | `agent/review-03-data` | Factual manuscript corrections, primary literature comparison, proposed study, and handoff |
+| 1 | `verify-results` | `main` at `a935d11` | Summary checks, original baseline reproduction record, and recovered image input evidence |
+| 2 | `fix-experiments` | `verify-results` | Run identity, resume, aggregation, scoring, BLIP, and input verification |
+| 3 | `fix-data-tools` | `fix-experiments` | Download behavior, annotation formats, local export, and dataset card corrections |
+| 4 | `review-manuscript` | `fix-data-tools` | Factual manuscript corrections, primary literature comparison, proposed study, and handoff |
 
 The grouping keeps revision resolution with all model loaders that use it.
 It also keeps BLIP loading and feature selection in that unit because they
@@ -54,9 +53,12 @@ No data transfer or GPU execution is needed to review these conditions.
 
 The prior direct BLIP probes used tiny local retrieval checkpoints under
 Transformers 4.40.0 and 4.44.2. They checked image sensitivity and gradients.
-They are engineering checks, not new benchmark results. Full pretrained BLIP,
-GPU execution, and the existing Python test suite remain unverified. Workspace
-instructions prohibit Python test runners.
+The subsequent full pretrained CPU check also passed, with no missing or
+mismatched checkpoint keys. Its pooled features matched the native retrieval
+model exactly, and image sensitivity and gradient checks passed. See the
+record and repeat procedure in `docs/run_verification.md`. These checks provide
+no new benchmark result. GPU execution and the existing Python test suite
+remain unverified. Workspace instructions prohibit Python test runners.
 
 ## Data unit
 
@@ -64,6 +66,14 @@ Review the CSV only download path separately from image folder fetching.
 The existing targeted probes checked top level selection, resumed transfers,
 and failure status. Downloading the whole public collection is not a required
 acceptance check.
+
+The final review reproduced a dependency compatibility failure. The old
+`gdown>=5.1` requirement allowed a version that rejected the downloader's
+arguments. Version 6.3 introduced the required timeout support, so the fetch
+dependency now requires `gdown>=6.3`. The installed 5.1.0 distribution reproduced
+the failure without network access. All three call signatures accepted the
+required arguments under 6.3.0. See the
+[upstream release](https://github.com/wkentaro/gdown/releases/tag/v6.3.0).
 
 Review export without invoking its publication option. The targeted probes
 checked canonical titles and label IDs, image path containment, missing images,
@@ -98,3 +108,23 @@ The user can retain the contribution on the fork while communication is
 unavailable. Review branches and verified evidence are useful contributions;
 upstream adoption and membership in the research group are not established by
 pushing them.
+
+## Final review limits
+
+The final review covered the 39 changed files at `67eb497` against `a935d11`,
+their relevant callers, and the subsequent dependency and verification changes.
+Separate automated reviews covered experiment code, data evidence, and paper
+claims. Their findings were checked by the primary reviewer. No external human
+review or author acceptance is claimed.
+
+The original annotation CSV reader still assumes a valid prior output file.
+A malformed existing header can raise an error, and an invalid nonempty label
+can mark an item complete. This behavior predates the contribution. Reviewers
+must validate an existing annotation file before using it to resume annotation.
+No annotation was resumed or changed during this review.
+
+Historical image identity, semantic pairing, annotation history, and seed
+input membership remain evidence gaps. GPU training, the real unannotated
+export, and submission page limits remain unchecked. A proposal with those
+limits stated can be reviewed, but it cannot be described as a complete study
+replication. Opening a PR requires the contributor's later explicit approval.
