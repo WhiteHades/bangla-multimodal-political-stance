@@ -1,4 +1,4 @@
-# Proposed comparison of image contribution
+# Recorded protocol for the image contribution comparison
 
 ## Material passport
 
@@ -6,13 +6,24 @@
 | :--- | :--- |
 | Origin | Academic research suite, experiment planning |
 | Date | 23 October 2026 |
-| Status | Proposed protocol, not an executed or registered study |
+| Status | Original protocol recorded before execution, not registered |
 | Scope | One comparison using fixed text and image representations |
 
 The proposal was written after historical results were available. Its new
 comparisons must be fixed before their predictions are inspected. The existing
 items have already supported development, so they are not an untouched test set.
 Author adoption into the paper remains a separate decision.
+
+## Execution update
+
+The comparison has now run locally and has been repeated from an independent
+branch based directly on upstream main. The implementation, aggregate results,
+verification records and proposed manuscript wording are in
+[the focused study PR](https://github.com/kishormorol/bangla-multimodal-political-stance/pull/6).
+The remaining sections preserve the proposal recorded at revision
+`f99ab56f38956345fbbb92af90c94d2317c86e0f`, including its statements about
+work that had not run at that point. The manuscript does not adopt the new
+result. That decision remains with the author.
 
 ## Question and available evidence
 

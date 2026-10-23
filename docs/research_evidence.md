@@ -168,6 +168,9 @@ cannot certify the collection. Larger annotation or model sample sizes must
 follow a stated precision target or a paired effect calculation using pilot
 predictions and the actual grouping structure.
 
-The proposed study has not run. Narrowing the current claim can make further
-experiments unnecessary. No additional dataset was combined with this corpus,
-and no automated semantic judgment was presented as human review.
+The proposed comparison has since been completed locally. Its recorded
+configuration, results, independent repeat and proposed manuscript wording
+are in [the focused study PR](https://github.com/kishormorol/bangla-multimodal-political-stance/pull/6).
+The proposal above records the reasoning before execution. Adopting the new
+result remains the author's decision. No additional dataset was combined with
+the corpus, and no automated semantic judgment was presented as human review.
