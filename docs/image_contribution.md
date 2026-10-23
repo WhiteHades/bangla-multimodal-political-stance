@@ -56,3 +56,64 @@ identical item predictions before interpreting the new comparison. Recalculate
 the summaries from saved predictions and verify every artifact checksum.
 Independent Bangla review and historical image byte identity remain separate
 evidence requirements. Author adoption of the study remains a separate decision.
+
+## Completed local run
+
+The run finished on 23 October 2026 at implementation revision
+`cb359f50b09358ede5ca67dbff6c5830ddc635e4`, recorded in
+`reports/verification/image_contribution.json`. The aggregate record contains
+the configuration, source and artifact checksums, software versions, model
+loading details, every condition's scores, and verification results. It contains
+no headlines, photos, image features, or item prediction records.
+
+All conditions scored the same 149 items in 148 source groups. Class counts
+were 72 government critique, 43 neutral, and 34 government leaning. Seed 42
+used the saved five folds. The primary pooled results were:
+
+| Condition | Macro F1 | Conditional 95 percent interval |
+| :--- | ---: | :--- |
+| A, text | 0.5642 | 0.4820 to 0.6420 |
+| B, text and images | 0.4588 | 0.3752 to 0.5423 |
+| C, images | 0.4074 | 0.3262 to 0.4854 |
+
+Adding the fixed image features reduced the primary score by 0.1054. The
+paired interval indicates a decrease of 0.0230 to 0.1812. The predeclared
+decision rule therefore supports reduced prediction under the fixed setup.
+The primary upper bound is below each illustrative gain threshold of 0.02,
+0.05, and 0.10. No accepted threshold for a useful effect was chosen.
+
+All four additional fold assignments also gave lower point estimates for B.
+The intervals for seeds 43 and 44 excluded zero. The intervals for seeds 45
+and 46 included zero. The five point estimates ranged from a decrease of
+0.0469 to a decrease of 0.1224. Every seed's results remain in the aggregate
+record. Reusing the items does not create five independent datasets.
+
+The local NVIDIA GeForce GTX 1650 Ti extracted the 149 image vectors in
+4.66 seconds after model loading. Peak GPU memory reserved was 482,344,960
+bytes. The 75 classifier fits used the CPU and took 1.99 seconds in total
+within the recorded fit timers. The fit limit was 2,000 iterations, and the
+largest observed count was 16. Downloading, model loading, text preprocessing,
+and statistical analysis are outside those timing claims.
+
+Verification checked all 20 run artifact checksums and all 156 frozen input
+files. A separate run through `bmpb.crossval.cross_validate`, with augmentation
+disabled, produced identical text predictions for all 149 items. Its labels,
+groups, and folds also matched. Independent calculations from saved predictions
+reproduced the confusion counts, macro F1, accuracy, condition intervals, and
+paired intervals for all five seeds. The numerical tolerance was 0.000000000000001.
+The historical numerical reports and input files remain unchanged.
+
+The experiment supports a limited conclusion about stored label prediction
+with one frozen image representation and one linear classifier. It does not
+establish that photographs lack useful stance information. The images' identity
+with historical training inputs is unknown, and the labels and semantic image
+pairings still need independent Bangla review. The items have already supported
+development, and source grouping does not establish event or outlet independence.
+The intervals omit model refitting and annotation uncertainty.
+
+The unchanged protocol and the complete aggregate results allow another
+researcher to rerun the comparison against the exact frozen bundle. Access
+to that local bundle is necessary to verify the prediction records. No new
+model search or shuffled image experiment is justified by the negative primary
+result alone. Adopting the result in the manuscript requires the author's
+decision.
