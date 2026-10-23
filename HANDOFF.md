@@ -8,7 +8,8 @@ files remain local. The evidence and repeat procedures are in
 
 Verified: report arithmetic, four original text baselines, input hashes and
 image decoding, Rust checks, and full pretrained BLIP CPU and GPU probes.
-GitHub CI passed lint, formatting, Python tests, and imports on all four PRs.
+The integrated version passed GitHub CI lint, formatting, Python tests, and
+imports. The separate upstream branches passed the relevant local checks.
 The revised manuscript compiled. Historical numerical reports remain unchanged.
 
 Open: historical image identity, original neural predictions, independent
