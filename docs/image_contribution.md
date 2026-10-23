@@ -3,7 +3,7 @@
 The configuration `configs/ablations/image_contribution.yaml` fixes the
 comparison before execution. Its protocol is the proposal at Git revision
 `f99ab56f38956345fbbb92af90c94d2317c86e0f`, in
-`docs/replication_protocol.md`. That proposal was written after historical
+[`docs/replication_protocol.md` at that revision](https://github.com/WhiteHades/bangla-multimodal-political-stance/blob/f99ab56f38956345fbbb92af90c94d2317c86e0f/docs/replication_protocol.md). That proposal was written after historical
 results were available. This experiment predicts the existing stored labels
 on a recovered input snapshot.
 
@@ -117,3 +117,21 @@ to that local bundle is necessary to verify the prediction records. No new
 model search or shuffled image experiment is justified by the negative primary
 result alone. Adopting the result in the manuscript requires the author's
 decision.
+
+## Independent branch verification
+
+The study branch starts directly from upstream revision `a935d11`. Its helper
+adapter supplies the frozen groups to the original upstream analysis interface
+and also accepts the interface in the companion model PR. A complete repeat
+at revision `4050e40f9fa35ba47c98e1288591cdac07a3c077` produced identical image feature bytes,
+all 15 prediction CSVs, and every score and interval. The aggregate record
+contains the repeat implementation and artifact checksums. No new conditions,
+parameters, or evaluation items were introduced. The original run remains
+unchanged. The branch can therefore be reviewed without including the model PR.
+
+## Proposed manuscript wording
+
+The following paragraph is a proposal for the author. It is not inserted into
+the manuscript. Its numbers come from the aggregate record above.
+
+We evaluated the addition of frozen ViT image features to identical character TF IDF features on 149 recovered items in 148 source groups. The primary saved fold assignment gave macro F1 0.5642 for text and 0.4588 for text and images. Their conditional 95 percent source group intervals were 0.4820 to 0.6420 and 0.3752 to 0.5423, respectively. Adding images reduced macro F1 by 0.1054, with a paired conditional 95 percent interval for the decrease of 0.0230 to 0.1812. All four additional fold assignments gave lower point estimates, and two of their intervals included zero. The comparison uses a fixed encoder and linear classifier to predict stored labels. It does not establish that images lack stance information or that the recovered image bytes match the historical inputs. The intervals condition on saved predictions and omit uncertainty from refitting, annotations, events and outlets. The repeated fold assignments reuse the same items, which have already supported development.
