@@ -108,6 +108,19 @@ fn main() {
     assert!(String::from_utf8_lossy(&repeated.stdout).contains("matching run"));
     assert_eq!(run_directories(&fixture), 1);
 
+    success(&run(
+        &python,
+        &fixture,
+        &["-c", "import json; from pathlib import Path; p=Path('runs/sweep_summary.json'); rows=json.loads(p.read_text()); rows[0]['macro_f1']=-1; p.write_text(json.dumps(rows))"],
+    ));
+    success(&run(&python, &fixture, &args));
+    assert_eq!(run_directories(&fixture), 1);
+    success(&run(
+        &python,
+        &fixture,
+        &["scripts/seed_analysis.py", "runs", "--dest", "repaired_summary"],
+    ));
+
     let mut changed = args;
     changed[6] = "43";
     success(&run(&python, &fixture, &changed));

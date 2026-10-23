@@ -120,6 +120,15 @@ def main():
                             and saved_cv.get("identity") == identity
                             and valid_artifacts
                         ):
+                            old.update(
+                                {
+                                    key: value
+                                    for key, value in saved_cv.items()
+                                    if key not in {"population", "run_dir"}
+                                }
+                            )
+                            old.update(input_items=len(frame), input_sha256=digest(frame))
+                            write_json(summary_path, rows)
                             print(
                                 f"skip {population}/{name}: matching run and artifacts exist",
                                 flush=True,
