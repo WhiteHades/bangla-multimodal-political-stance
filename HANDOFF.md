@@ -1,3 +1,56 @@
+## 23 October 2026, Codex, final review on review-manuscript
+
+Done: reviewed the completed contribution against `a935d11`, with separate
+automated reviews of experiment code, data evidence, and paper claims. The
+review found an incompatible download dependency requirement and invalid
+annotation resume behavior. Both were reproduced and corrected. The fetch
+extra now requires `gdown>=6.3`. Annotation resume validates the existing CSV
+before dataset loading and rejects conflicting labels without changing records.
+The new `checks/annotations.rs` covers valid resume and malformed inputs.
+
+The contributor explicitly replaced the branch naming convention for this
+work. The active review branches are `verify-results`, `fix-experiments`,
+`fix-data-tools`, and `review-manuscript`, in that order. Files remain in the
+existing repository directories. The default branch and historical reports
+remain unchanged. Earlier entries retain their historical branch names.
+No PR may be opened until the contributor explicitly approves that action.
+
+Verified: the full public BLIP retrieval weights loaded on CPU with no
+missing, unexpected, or mismatched keys. Wrapper features exactly matched
+the native retrieval path. Changing synthetic images changed the output.
+Frozen and enabled encoder gradients behaved as expected. The source
+revision, weight hash, software, numerical differences, and 18.12 second
+probe time are recorded in `reports/verification/pretrained_blip.json`.
+This was an implementation check with no optimizer steps or benchmark scores.
+
+Both existing Rust checks passed, as did the new annotation check. Ruff and
+Black passed on 46 Python files. The old annotation reader was demonstrated
+to mark label 99 as complete; the corrected reader rejects it before loading
+data. The installed gdown 5.1.0 distribution reproduced the unsupported
+argument error, while 6.3.0 accepted all required call signatures.
+The original input manifest still verifies 198 records and 106 file states.
+The recovered bundle verifies 198 records and 156 file states, including
+149 images that fully decode. Historical numerical reports match `a935d11`.
+
+Primary passages for BanglaBias, Liang, and CANDOR were rechecked, including
+annotation roles, example units, controls, and reuse limits. The BanglaBias
+dataset card lists MIT. The source locations and scope of targeted reading
+are recorded in `docs/research_evidence.md`. The statistical review and
+remaining evidence gaps are recorded in `docs/review_branches.md`.
+
+Not verified: GPU or Colab execution, historical image byte identity, original
+neural predictions, independent Bangla interpretation, original annotation
+history, the real unannotated export, and submission page limits. The existing
+Python test suite remains unrun because workspace instructions prohibit its
+runner. These limitations are not resolved by automated review. The proposed
+controlled image comparison remains unexecuted. Mantis fetched successfully
+but its local checkout could not fast forward; its existing guidance was used.
+
+Needs the author: scientific framing, annotation interpretation, and adoption
+of the proposed study. Needs the contributor: a later explicit decision to
+open a PR. No communication, data upload, dataset publication, or GPU work
+was performed.
+
 ## 23 October 2026, Codex, replication readiness and review units
 
 Done: recovered current public image files for all 149 saved paired identifiers

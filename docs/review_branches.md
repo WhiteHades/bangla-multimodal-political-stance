@@ -117,11 +117,35 @@ Separate automated reviews covered experiment code, data evidence, and paper
 claims. Their findings were checked by the primary reviewer. No external human
 review or author acceptance is claimed.
 
-The original annotation CSV reader still assumes a valid prior output file.
-A malformed existing header can raise an error, and an invalid nonempty label
-can mark an item complete. This behavior predates the contribution. Reviewers
-must validate an existing annotation file before using it to resume annotation.
-No annotation was resumed or changed during this review.
+The review also reproduced an annotation resume defect. An invalid nonempty
+label previously marked an item complete. The reader now rejects incorrect
+headers, incomplete rows, invalid IDs or labels, inconsistent label names, and
+conflicting labels for one ID. The Rust annotation check confirms valid resume
+and rejection before loading data or changing the existing file. No real
+annotation was resumed or changed during this review.
+
+The final checks passed: report arithmetic and corrupted report rejection,
+the synthetic experiment flow, annotation resume, Ruff, and Black on 46 Python
+files. The original input manifest still verifies 198 records and 106 file
+states. The recovered bundle verifies 198 records and 156 file states, with
+149 fully decoded images. The historical numerical reports still match
+`a935d11` byte for byte.
+
+The statistical review considered eleven common interpretation problems:
+
+| Check | Finding or limit |
+| :--- | :--- |
+| Reversal within subgroups | Historical neural predictions are unavailable, so event and outlet reversals cannot be tested. |
+| Group claims applied to individuals | Outlet reputation is distinguished from an item's stance. No new individual inference is established. |
+| Selection induced associations | Event selection and image availability limit the population represented by the scores. |
+| Conditioning on a shared consequence | Image availability could depend on source or content. The surviving records do not identify that selection process. |
+| Ignoring class prevalence | Class counts and the majority baseline are reported. Macro F1 uses the frozen three class set. |
+| Regression toward an average | Historical and corrected scores come from different procedures. Their difference is not a controlled intervention effect. |
+| Missing or excluded cases | The 149 item matched and 86 item seed populations remain distinct. Missing seed membership prevents reconciliation. |
+| Searching many comparisons | Historical intervals are descriptive and do not establish a family wide error rate. The proposal fixes one primary contrast. |
+| Flexible analysis choices | The proposal follows inspection of historical results and uses previously studied data. It is not a registered or untouched evaluation. |
+| Association described as cause | Existing comparisons change text representation and image use together. They do not isolate image contribution. |
+| Reversed causal direction | Predictive stance scores do not establish effects of media content on political attitudes or events. |
 
 Historical image identity, semantic pairing, annotation history, and seed
 input membership remain evidence gaps. GPU training, the real unannotated

@@ -6,6 +6,19 @@ Sources were searched and checked on 23 October 2026. Reading was targeted
 to the relevant methods, results, and release records. No source below is
 claimed as a full paper read.
 
+The final review on the same date rechecked the primary passages supporting
+the closest comparisons. BanglaBias Section 3 and its annotation appendices
+support the 200 article count, event selection, and separate initial annotation
+and adjudication roles. Its public
+[dataset card](https://huggingface.co/datasets/dipta007/BanglaBias/raw/main/README.md)
+lists MIT, which does not settle permissions for added photographs. Liang
+Sections 3.1 to 3.4, Appendix B, and the split footnote confirm the five datasets,
+explicit targets, image pair construction, and grouping by tweet ID. CANDOR
+Sections 3, 6.3.6, 6.5 and 9, including Table 13, describe its news population,
+textual controls, and transfer limits. These were passage checks, not full
+paper reads or independent replications. The direct source links below
+identify the copies consulted.
+
 ## Search scope
 
 The search covered Bangla political stance, paired news images and text,
