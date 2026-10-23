@@ -13,6 +13,11 @@ work. The active review branches are `verify-results`, `fix-experiments`,
 `fix-data-tools`, and `review-manuscript`, in that order. Files remain in the
 existing repository directories. The default branch and historical reports
 remain unchanged. Earlier entries retain their historical branch names.
+The earlier published contribution branches are preserved as
+`historical-evidence-review`, `historical-manuscript-review`,
+`historical-integrated-review`, and `historical-replication-review`.
+Each renamed remote branch was checked to contain the previous commits before
+retiring its old name. The local working branches also use topic names.
 No PR may be opened until the contributor explicitly approves that action.
 
 Verified: the full public BLIP retrieval weights loaded on CPU with no
