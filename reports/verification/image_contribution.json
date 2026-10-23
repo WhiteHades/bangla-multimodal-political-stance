@@ -1048,6 +1048,9 @@
       "vision.json": "7310be73ba8f12eb57928468bfc5fe33f80653cd0439f9948a2979051c639a2e"
     },
     "setup_failure": "Initial checkout could not resolve the private bundle before fitting. Its failure record is preserved separately. Correcting the local input link allowed the unchanged study configuration to run.",
-    "analysis_interfaces": "Original upstream helper receives the frozen group mapping. The companion model PR helper reads those groups from the same prediction frames."
+    "analysis_interfaces": "Original upstream helper receives the frozen group mapping. The companion model PR helper reads those groups from the same prediction frames.",
+    "same_local_machine": true,
+    "same_software_versions": true,
+    "external_researcher_replication": false
   }
 }

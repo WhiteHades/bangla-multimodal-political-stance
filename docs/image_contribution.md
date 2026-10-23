@@ -130,6 +130,9 @@ all 15 prediction CSVs, and every score and interval. The aggregate record
 contains the repeat implementation and artifact checksums. No new conditions,
 parameters, or evaluation items were introduced. The original run remains
 unchanged. The branch can therefore be reviewed without including the model PR.
+Both runs used the same local GPU, frozen files and software versions. The
+repeat verifies branch separation and local execution. An external researcher
+has not replicated the experiment.
 
 ## Proposed manuscript wording
 
