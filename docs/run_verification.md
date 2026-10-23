@@ -85,13 +85,54 @@ rejection, preservation of the old output, aggregation without paired models,
 retained identity, valid JSON, duplicate seed rejection, and changed input
 manifest rejection.
 
-The BLIP wrapper was also checked with a tiny synthetic retrieval checkpoint
+The BLIP wrapper was first checked with a tiny synthetic retrieval checkpoint
 under Transformers 4.40.0 and 4.44.2 on CPU. Changing pixels changed its logits.
 Frozen and unfrozen encoder gradients followed the configured setting. The
 synthetic vision weights used an initialization scale of 0.02 to make the
 check sensitive to pixels; the tiny model's default near zero scale would
-make that probe uninformative. No pretrained BLIP weights were downloaded,
-and these checks provide no new benchmark score.
+make that probe uninformative. These checks provide no new benchmark score.
+
+The final CPU check used the full public retrieval checkpoint at revision
+`bed8ad38cb2d04a5a4bdf2d071b3c3c0a4aa724c`. Its source file hash, software
+versions, numerical differences, and gradient checks are recorded in
+`reports/verification/pretrained_blip.json`. The checkpoint loaded with no
+missing, unexpected, or mismatched keys. The wrapper features exactly matched
+the native retrieval model's first image conditioned text state. Changing
+the image changed both the features and the classifier logits. The frozen
+encoder received no gradients. After enabling encoder gradients, both text
+and vision parameters received finite, nonzero gradients. The classifier
+received gradients in both conditions.
+
+To repeat the check without dataset files:
+
+1. Download the named revision's `pytorch_model.bin`, configuration, and
+   processor files. Verify the weight file against the recorded SHA256.
+   Load its state with `torch.load(weights_only=True, map_location="cpu")`.
+   Pass that state to `BlipForImageTextRetrieval.from_pretrained` with
+   `output_loading_info=True`, then save it locally with safe serialization.
+   Save the processor alongside it. The format conversion preserves the
+   loaded model weights and avoids unrestricted pickle loading in the wrapper.
+2. Use the recorded Torch and Transformers versions, two CPU threads,
+   `torch.manual_seed(42)`, and `configs/multimodal/blip.yaml`. Replace only
+   `pretrained` with the local converted directory. Build through the normal
+   registry and select evaluation mode.
+3. Use a solid red RGB image and an RGB noise image, both 384 by 384 pixels.
+   Generate noise with `np.random.default_rng(42).integers(0, 256,
+   (384, 384, 3), dtype=np.uint8)`. Give both the fixed synthetic sentence
+   `সরকারের সিদ্ধান্ত নিয়ে আলোচনা` and label zero. Use the repository
+   `Collator` with the configured maximum text length.
+4. Compare `_blip_multimodal_features` with the native backbone call using
+   `use_itm_head=True` and `question_embeds[:, 0]`. Require exact equality,
+   finite logits with shape `[2, 3]`, and a change exceeding `1e-5` in both
+   features and logits when the image changes. Backpropagate cross entropy
+   once with the frozen encoder, then once on the first example after
+   enabling encoder gradients. Require finite, nonzero classifier gradients,
+   no frozen encoder gradients, and finite, nonzero text and vision gradients
+   when enabled.
+
+The measured check took 18.12 seconds after download on this workstation.
+It used synthetic inputs, performed no optimizer steps, and produced no
+benchmark predictions. It does not verify GPU execution or training quality.
 
 The full existing Python test suite was not run because the workspace
 instructions prohibit Python test runners. The small Rust checks and direct
