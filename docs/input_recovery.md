@@ -69,9 +69,10 @@ the population with the image table by identifiers. Reproduce the headline
 input checksum and the seed 42 folds before training anything.
 
 Finally, restore the private bundle into a clean verified implementation
-checkout. Run `python scripts/input_manifest.py`, which is provided in the
-experiment integrity review unit. Compare its manifest hash with the aggregate
-record. The public `scripts/verify_reports.py` checks the aggregate's source
+checkout. The command `python scripts/input_manifest.py` requires the script
+from [the experiment integrity PR](https://github.com/kishormorol/bangla-multimodal-political-stance/pull/3).
+That script is not included in the evidence PR. Compare the verified manifest
+hash with the aggregate record. The public `scripts/verify_reports.py` checks the aggregate's source
 identity and count arithmetic. It does not access the private images or prove
 that those files were downloaded correctly.
 
