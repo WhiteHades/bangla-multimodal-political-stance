@@ -20,8 +20,7 @@ describe different item counts and require separate interpretation. See the
 [evidence status](docs/evidence_status.md) for reproducible arithmetic checks
 and the limits of the available artifacts.
 
-The [review branch guide](docs/review_branches.md) gives the ordered contribution
-units and their checks. The [recovered input record](docs/input_recovery.md)
+The [recovered input record](docs/input_recovery.md)
 and [proposed image comparison](docs/replication_protocol.md) distinguish
 available replication inputs from experiments that have not run.
 
