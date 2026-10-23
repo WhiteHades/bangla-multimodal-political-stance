@@ -54,9 +54,9 @@ corrected to the verified [Prothom Alo article](https://www.prothomalo.com/busin
 whose headline matches upstream ID 160. Its labels and image mapping are unchanged;
 `source_url_original` retains the old URL. Image_154/Image_155 remain in one group.
 The baseline reruns are recorded in `reports/submission/baselines.md`.
-Subsequent matched and seed summaries are committed separately. Their
-verification limits and population mismatch are recorded in
-[`evidence_status.md`](evidence_status.md).
+The subsequent [matched report](../reports/submission/matched.json) records
+149 paired items. The separate [seed report](../reports/submission/seeds.json)
+records 86 paired items. Compare their populations before comparing scores.
 
 ## Supported manuscript wording
 

@@ -94,7 +94,7 @@ label (0, 1, or 2). The export preserves the stored label ID. The local
 provenance audit found consistent upstream matches for 145 processed rows and
 no exact normalized match for 53 rows. The unmatched rows are not thereby
 established as independently collected. See
-[`docs/dataset-provenance.md`](../docs/dataset-provenance.md) for the audit and
+[the repository provenance audit](https://github.com/kishormorol/bangla-multimodal-political-stance/blob/a935d118dd843cb40ed14bfeaa2a958c1e0ce111/docs/dataset-provenance.md) for the audit and
 its limits. The stored annotation columns cover 32, 197, and 197 of 198 items.
 The saved audit reports rounded pairwise Cohen's kappa of 0.73 for the
 two columns with 197 jointly labelled items. Original annotator roles,

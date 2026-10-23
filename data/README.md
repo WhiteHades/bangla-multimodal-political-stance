@@ -3,8 +3,9 @@
 The counts and fixed split descriptions below include historical snapshots.
 The committed matched report later records 149 items with readable images,
 while the separate seed comparisons record 86. Image availability depends on
-the input snapshot and decoding environment. See
-[`docs/evidence_status.md`](../docs/evidence_status.md) before comparing scores.
+the input snapshot and decoding environment. Check the populations in
+[`matched.json`](../reports/submission/matched.json) and
+[`seeds.json`](../reports/submission/seeds.json) before comparing scores.
 
 Nothing in `data/` is committed. Run `make data` (or `bash scripts/fetch_data.sh`)
 to mirror the shared Drive folder into `data/raw/`, then `make ingest && make splits`.
