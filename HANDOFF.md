@@ -1,3 +1,27 @@
+## 2026 October 23, Codex, image contribution
+
+Done: added `scripts/image_contribution.py`, its fixed configuration, one
+synthetic Rust check, and `docs/image_contribution.md`. Ran the comparison
+locally on the frozen 149 item input bundle. The aggregate evidence is in
+`reports/verification/image_contribution.json`. Historical results and labels
+remain unchanged.
+
+Verified: all 75 fits finished. All 20 output artifact checksums and 156 input
+file checksums matched. A separate text run through the existing CV runner
+matched all 149 predictions. Independent calculations reproduced all five
+fold assignments' metrics and source group intervals. Adding images reduced
+primary macro F1 from 0.5642 to 0.4588, with a paired interval for the decrease
+of 0.0230 to 0.1812. The result concerns prediction of stored labels under the
+fixed configuration.
+
+Not verified: historical image byte identity, label visibility, semantic image
+pairings, independent events or outlets, and performance on future news.
+The intervals condition on fitted predictions and omit model refitting.
+
+Needs the author: decide whether to adopt the result in the paper. The original
+data, image features, and item predictions remain local. No additional PR was
+opened for the experiment branch.
+
 ## 2026-10-12 · Claude (Opus 5.5, Claude Code) · agent/experiments-grouped-evaluation (seeds)
 
 Done: the author asked for a multi-seed rerun on Colab. Added `--seed` to
